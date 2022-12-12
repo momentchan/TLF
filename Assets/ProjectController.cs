@@ -7,7 +7,8 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class ProjectController : MonoBehaviour
 {
-    [SerializeField] private KeyCode debugKey = KeyCode.D;
+    [SerializeField] private KeyCode leftKey = KeyCode.Q;
+    [SerializeField] private KeyCode rightKey = KeyCode.W;
     [SerializeField] private SimulateQuad leftQuad;
     [SerializeField] private SimulateQuad rightQuad;
 
@@ -18,14 +19,14 @@ public class ProjectController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(debugKey))
+        if (Input.GetKeyDown(leftKey))
         {
-            leftQuad.gameObject.SetActive(leftQuad.gameObject.activeSelf);
+            leftQuad.gameObject.SetActive(!leftQuad.gameObject.activeSelf);
         }
 
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(debugKey))
+        if (Input.GetKeyDown(rightKey))
         {
-            rightQuad.gameObject.SetActive(rightQuad.gameObject.activeSelf);
+            rightQuad.gameObject.SetActive(!rightQuad.gameObject.activeSelf);
         }
 
         leftQuad.SetCoordinates(GetPosition(ControlPointType.LeftBottom),
