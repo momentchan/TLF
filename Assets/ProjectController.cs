@@ -16,9 +16,14 @@ public class ProjectController : MonoBehaviour
     [SerializeField] private Color color;
     [SerializeField] private List<Vector2> points;
     [SerializeField] private List<ControlPoint> controls;
+    [SerializeField] private bool debug;
 
     void Update()
     {
+        leftQuad.gameObject.SetActive(debug);
+        rightQuad.gameObject.SetActive(debug);
+
+
         if (Input.GetKeyDown(leftKey))
         {
             leftQuad.gameObject.SetActive(!leftQuad.gameObject.activeSelf);
