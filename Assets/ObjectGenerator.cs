@@ -12,6 +12,12 @@ public class ObjectGenerator : MonoBehaviour
     [SerializeField] private float radius = 1;
     [SerializeField] private float spawnRate = 0.2f;
     [SerializeField] private int maxCount = 100;
+    [SerializeField] private float drag = 2f;
+    [SerializeField] private PhysicMaterial material;
+    [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
+    [SerializeField] private float staticFriction = 0.6f;
+    [SerializeField] private float dynamicFriction = 0.6f;
+
     void Start()
     {
         StartCoroutine(Spawn());
@@ -24,12 +30,19 @@ public class ObjectGenerator : MonoBehaviour
             RandomGenerate();
         if (Input.GetKeyDown(KeyCode.C))
             Clear();
+
+        foreach (var c in capsules)
+            c.Rigidbody.drag = drag;
+
+        material.bounciness = bounciness;
+        material.staticFriction = staticFriction;
+        material.dynamicFriction = dynamicFriction;
     }
 
     void RandomGenerate()
     {
         var pos = Vector3.zero;
-        for (var i = 0; i <20; i++)
+        for (var i = 0; i < 20; i++)
         {
             pos = center + new Vector3(
                 Mathf.Lerp(-0.5f, 0.5f, Random.value) * size.x,
@@ -46,10 +59,11 @@ public class ObjectGenerator : MonoBehaviour
         c.transform.rotation = Random.rotation;
         capsules.Add(c);
     }
+
     IEnumerator Spawn()
     {
         yield return null;
-        while (capsules.Count<maxCount)
+        while (capsules.Count < maxCount)
         {
             RandomGenerate();
             yield return new WaitForSeconds(spawnRate);

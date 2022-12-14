@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class Capsule : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public Rigidbody Rigidbody => rigidbody;
+    public CapsuleCollider Collider => collider;
+
+    CapsuleCollider collider;
+    Rigidbody rigidbody;
     void Start()
     {
-        
+        rigidbody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         
