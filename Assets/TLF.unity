@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &46324037
 Transform:
   m_ObjectHideFlags: 0
@@ -149,7 +149,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 46324036}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.06499958, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -776,7 +776,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &261365058
 MonoBehaviour:
@@ -1020,80 +1020,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1001 &606180842
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 8285017846179969448, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_Name
-      value: BodyPoseProvider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969448, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 14
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8285017846179969451, guid: 4b62ccd2d432a6748980088ef605c779,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 4b62ccd2d432a6748980088ef605c779, type: 3}
 --- !u!1 &642828780
 GameObject:
   m_ObjectHideFlags: 0
@@ -1112,7 +1038,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &642828781
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1307,7 +1233,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &806613827
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1890,10 +1816,13 @@ MonoBehaviour:
   spawnRate: 0.01
   maxCount: 800
   drag: 4
-  material: {fileID: 13400000, guid: 523391a9bf49e064db137715d9dbe244, type: 2}
+  physicMat: {fileID: 13400000, guid: 523391a9bf49e064db137715d9dbe244, type: 2}
+  renderMat: {fileID: 2100000, guid: 7f7c3e252f243cd4f8bb8854b9b5ca84, type: 2}
   bounciness: 0.6
+  mass: 1
   staticFriction: 0.6
   dynamicFriction: 0.6
+  sizeRange: {x: 1, y: 1.2}
 --- !u!1 &1112894534
 GameObject:
   m_ObjectHideFlags: 0
@@ -2042,7 +1971,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &1182864170
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2729,7 +2658,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1458888348
 MonoBehaviour:
@@ -2743,7 +2672,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f9b2ebac578aaf4fb4ca85ea4cfc142, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  provider: {fileID: 1729915407}
+  provider: {fileID: 0}
 --- !u!1 &1503021470
 GameObject:
   m_ObjectHideFlags: 0
@@ -2762,7 +2691,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &1503021471
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2842,18 +2771,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1729915407 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8285017846179969428, guid: 4b62ccd2d432a6748980088ef605c779,
-    type: 3}
-  m_PrefabInstance: {fileID: 606180842}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 965ee91c14921e94bbf4d05097fde6c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1745661388
 GameObject:
   m_ObjectHideFlags: 19
@@ -2968,7 +2885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &2071254167
 MeshCollider:
   m_ObjectHideFlags: 0

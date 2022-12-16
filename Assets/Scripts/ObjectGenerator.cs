@@ -13,10 +13,13 @@ public class ObjectGenerator : MonoBehaviour
     [SerializeField] private float spawnRate = 0.2f;
     [SerializeField] private int maxCount = 100;
     [SerializeField] private float drag = 2f;
-    [SerializeField] private PhysicMaterial material;
+    [SerializeField] private PhysicMaterial physicMat;
+    [SerializeField] private Material renderMat;
     [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
+    [SerializeField] private float mass = 1f;
     [SerializeField] private float staticFriction = 0.6f;
     [SerializeField] private float dynamicFriction = 0.6f;
+    [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1.0f);
 
     void Start()
     {
@@ -32,11 +35,16 @@ public class ObjectGenerator : MonoBehaviour
             Clear();
 
         foreach (var c in capsules)
+        {
+            c.Rigidbody.mass = mass;
             c.Rigidbody.drag = drag;
+            c.SetMaterial(renderMat);
+            c.SetSize(sizeRange);
+        }
 
-        material.bounciness = bounciness;
-        material.staticFriction = staticFriction;
-        material.dynamicFriction = dynamicFriction;
+        physicMat.bounciness = bounciness;
+        physicMat.staticFriction = staticFriction;
+        physicMat.dynamicFriction = dynamicFriction;
     }
 
     void RandomGenerate()
