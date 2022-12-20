@@ -48,8 +48,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   indirectDiffuseLightingMultiplier:
-    m_OverrideState: 0
-    m_Value: 1.6
+    m_OverrideState: 1
+    m_Value: 2
   indirectDiffuseLightingLayers:
     m_OverrideState: 0
     m_Value: 255
@@ -230,7 +230,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 50
   meanFreePath:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 400
   enableVolumetricFog:
     m_OverrideState: 1
@@ -326,7 +326,7 @@ MonoBehaviour:
   active: 1
   rotation:
     m_OverrideState: 1
-    m_Value: 246
+    m_Value: 0
   skyIntensityMode:
     m_OverrideState: 1
     m_Value: 0
