@@ -10,6 +10,7 @@ public class FoamTransformDataset : ScriptableObject
     public List<FoamTransformData> GetTransformData() => data;
     public void SaveTransform(List<Transform> trans)
     {
+#if UNITY_EDITOR
         data.Clear();
         data =
             trans.Select(t => new FoamTransformData()
@@ -20,6 +21,7 @@ public class FoamTransformDataset : ScriptableObject
             }).ToList();
         EditorUtility.SetDirty(this);
         AssetDatabase.SaveAssets();
+#endif
     }
 
     [System.Serializable]

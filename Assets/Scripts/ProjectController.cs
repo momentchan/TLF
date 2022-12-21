@@ -40,7 +40,7 @@ public class ProjectController : MonoBehaviour
                                 GetPosition(ControlPointType.RightTop),
                                 GetPosition(ControlPointType.RightBottom));
     }
-
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = color;
@@ -52,7 +52,7 @@ public class ProjectController : MonoBehaviour
             Handles.Label(wpos, i.ToString());
         }
     }
-
+#endif
 
     public Vector2 GetPosition(ControlPointType type) => controls.FirstOrDefault(c => c.type == type).position;
 

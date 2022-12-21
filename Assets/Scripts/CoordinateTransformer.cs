@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+
 namespace TLF
 {
     public class CoordinateTransformer : MonoBehaviour
@@ -26,7 +27,7 @@ namespace TLF
 
         }
 
-
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             Gizmos.color = color;
@@ -38,6 +39,8 @@ namespace TLF
                 Handles.Label(wpos, i.ToString());
             }
         }
+#endif
+
         void Update()
         {
 
