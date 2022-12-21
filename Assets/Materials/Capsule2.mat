@@ -24,7 +24,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Capsule2
-  m_Shader: {fileID: -6465566751694194690, guid: 25c3941c988737e4eb7f2bd1f4eff50c,
+  m_Shader: {fileID: -6465566751694194690, guid: 20d0bcb5926294cdea698472c6bbda14,
     type: 3}
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
@@ -117,6 +117,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalFromTexture_fc23e720263d4f24b02a8f9377f29b5e_Texture_0:
+        m_Texture: {fileID: 2800000, guid: ed9f16a5ff7ea614b9c524c38ce54f5a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 2800000, guid: ed9f16a5ff7ea614b9c524c38ce54f5a, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -127,6 +131,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _RoughnessMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_422ac68b4d2e48d08f8360089efd1309_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 1920c8a56757b2b49a0dd9882ccfe653, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecularColorMap:

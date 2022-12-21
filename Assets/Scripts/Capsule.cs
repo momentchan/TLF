@@ -10,18 +10,12 @@ public class Capsule : MonoBehaviour
     CapsuleCollider collider;
     Rigidbody rigidbody;
     MeshRenderer renderer;
-    private float seed;
     private Vector3 initScale;
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
         renderer = GetComponent<MeshRenderer>();
-        seed = Random.value;
         initScale = transform.localScale;
-    }
-    public void SetSize(Vector2 range)
-    {
-        transform.localScale = initScale * Mathf.Lerp(range.x, range.y, seed);
     }
     public void SetMaterial(Material mat)
     {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ObjectGenerator : MonoBehaviour
@@ -19,14 +20,13 @@ public class ObjectGenerator : MonoBehaviour
     [SerializeField] private float mass = 1f;
     [SerializeField] private float staticFriction = 0.6f;
     [SerializeField] private float dynamicFriction = 0.6f;
-    [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1.0f);
+
+    [SerializeField] FoamTransformDataset foams;
 
     void Start()
     {
-        StartCoroutine(Spawn());
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.G))
@@ -39,7 +39,6 @@ public class ObjectGenerator : MonoBehaviour
             c.Rigidbody.mass = mass;
             c.Rigidbody.drag = drag;
             c.SetMaterial(renderMat);
-            c.SetSize(sizeRange);
         }
 
         physicMat.bounciness = bounciness;
@@ -68,13 +67,23 @@ public class ObjectGenerator : MonoBehaviour
         capsules.Add(c);
     }
 
-    IEnumerator Spawn()
+    [ContextMenu("Save")]
+    void SaveTransform()
     {
-        yield return null;
-        while (capsules.Count < maxCount)
+        foams.SaveTransform(capsules.Select(c => c.transform).ToList());
+    }
+
+    [ContextMenu("Generate")]
+    void Generate()
+    {
+        Clear();
+        foreach(var d in foams.GetTransformData())
         {
-            RandomGenerate();
-            yield return new WaitForSeconds(spawnRate);
+            var c = Instantiate(prefab, transform);
+            c.transform.localPosition = d.localPosition;
+            c.transform.localRotation = d.localRotation;
+            c.transform.localScale = d.localScale;
+            capsules.Add(c);
         }
     }
 
