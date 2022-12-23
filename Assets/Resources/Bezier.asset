@@ -14,16 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data:
     cps:
-    - position: {x: -3.3758695, y: 2.2682548, z: 2.8107789}
-    - position: {x: -3.308537, y: 2.2682548, z: 0.19164395}
-    - position: {x: -3.7365446, y: 2.0038953, z: -4.5100226}
+    - position: {x: -3.2653031, y: 2.2682548, z: 2.8107789}
+    - position: {x: -4.297621, y: 2.2682548, z: 0.5082698}
+    - position: {x: -3.0413299, y: 1.7574588, z: -3.0198073}
+    - position: {x: -2.9552834, y: 1.7563905, z: -3.0553062}
+    - position: {x: -2.869237, y: 1.7553221, z: -3.090805}
+    - position: {x: -1.9576063, y: 0.9914031, z: -4.4425254}
     - position: {x: 3.2427492, y: 2.0038953, z: -3.2196193}
-    modes: 0000000000000000
-    bezierLength: 11.114782
+    modes: 000000000000000000000000
+    bezierLength: 12.491429
     bezierBoundingSize: {x: 0, y: 0, z: 0}
     bezierBoundingCenter: {x: 0, y: 0, z: 0}
     bezierCurvesLength:
-    - 11.114782
+    - 6.0367203
+    - 6.454709
     normalizeBezierPoints:
+    - 0.48326898
     - 1
     loop: 0

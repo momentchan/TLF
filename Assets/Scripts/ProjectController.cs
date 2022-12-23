@@ -1,35 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using mj.gist;
 using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
 public class ProjectController : MonoBehaviour
 {
-    [SerializeField] private KeyCode leftKey = KeyCode.Q;
-    [SerializeField] private KeyCode rightKey = KeyCode.W;
     [SerializeField] private SimulateQuad leftQuad;
     [SerializeField] private SimulateQuad rightQuad;
 
     [SerializeField] Camera camera;
     [SerializeField] private Color color;
-    [SerializeField] private List<Vector2> points;
     [SerializeField] private List<ControlPoint> controls;
-    [SerializeField] private bool debug;
 
     void Update()
     {
-        if (Input.GetKeyDown(leftKey))
-        {
-            leftQuad.gameObject.SetActive(!leftQuad.gameObject.activeSelf);
-        }
-
-        if (Input.GetKeyDown(rightKey))
-        {
-            rightQuad.gameObject.SetActive(!rightQuad.gameObject.activeSelf);
-        }
-
         leftQuad.SetCoordinates(GetPosition(ControlPointType.LeftBottom),
                                 GetPosition(ControlPointType.LeftTop),
                                 GetPosition(ControlPointType.MiddleTop),
@@ -44,11 +31,11 @@ public class ProjectController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = color;
-        for (var i = 0; i < points.Count; i++)
+        for (var i = 0; i < controls.Count; i++)
         {
-            var p = points[i];
-            var wpos = camera.ViewportToWorldPoint(new Vector3(p.x, p.y, camera.farClipPlane));
-            Gizmos.DrawSphere(wpos, 0.5f);
+            var p = controls[i].position;
+            var wpos = camera.ViewportToWorldPoint(new Vector3(p.x, p.y, camera.nearClipPlane));
+            GizmosUtil.DrawCross(wpos, 1e-3f);
             Handles.Label(wpos, i.ToString());
         }
     }

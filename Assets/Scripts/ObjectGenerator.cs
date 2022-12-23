@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Jobs;
 
 public class ObjectGenerator : MonoBehaviour
 {
@@ -12,7 +16,7 @@ public class ObjectGenerator : MonoBehaviour
     [SerializeField] private GameObject obstacle;
     [SerializeField] private float radius = 1;
     [SerializeField] private float spawnRate = 0.2f;
-    [SerializeField] private int maxCount = 100;
+    [SerializeField] public int maxCount = 100;
     [SerializeField] private float drag = 2f;
     [SerializeField] private PhysicMaterial physicMat;
     [SerializeField] private Material renderMat;
@@ -22,13 +26,43 @@ public class ObjectGenerator : MonoBehaviour
     [SerializeField] private float dynamicFriction = 0.6f;
 
     [SerializeField] FoamTransformDataset foams;
+    public TransformAccessArray Trs => trs;
+    protected TransformAccessArray trs;
+    [SerializeField] private bool useDrawMesh = true;
+    [SerializeField] ObjectRenderer r;
+     public List<Matrix4x4> matricess = new List<Matrix4x4>();
 
-    void Start()
+    void Awake()
     {
+        trs = new TransformAccessArray(0);
+        for (var i = 0; i < maxCount; i++)
+        {
+            trs.Add(capsules[i].transform);
+            matricess.Add(capsules[i].transform.localToWorldMatrix);
+        }
+            
     }
+    private void OnDestroy()
+    {
+        trs.Dispose();
+    }
+    public float4x4 GetStickMatrix(float4x4 xform, int id)
+    {
+        var capsule = capsules[id];
+        var m1 = float4x4.Translate(capsule.transform.localPosition);
+        var m2 = float4x4.EulerXYZ(capsule.transform.localRotation.eulerAngles);
+        return math.mul(math.mul(xform, m1), m2);
+    }
+
 
     void Update()
     {
+        r.enabled = useDrawMesh;
+        foreach (var c in capsules)
+        {
+            c.MeshRenderer.enabled = !useDrawMesh;
+        }
+
         if (Input.GetKeyDown(KeyCode.G))
             RandomGenerate();
         if (Input.GetKeyDown(KeyCode.C))
@@ -52,9 +86,9 @@ public class ObjectGenerator : MonoBehaviour
         for (var i = 0; i < 20; i++)
         {
             pos = center + new Vector3(
-                Mathf.Lerp(-0.5f, 0.5f, Random.value) * size.x,
-                Mathf.Lerp(0.2f, 0.4f, Random.value) * size.y,
-                Mathf.Lerp(-0.5f, 0.5f, Random.value) * size.z);
+                Mathf.Lerp(-0.5f, 0.5f, UnityEngine.Random.value) * size.x,
+                Mathf.Lerp(0.2f, 0.4f, UnityEngine.Random.value) * size.y,
+                Mathf.Lerp(-0.5f, 0.5f, UnityEngine.Random.value) * size.z);
 
             var op = obstacle.transform.position;
             if (Vector2.Distance(new Vector2(pos.x, pos.z), new Vector2(op.x, op.z)) > radius)
@@ -63,7 +97,7 @@ public class ObjectGenerator : MonoBehaviour
 
         var c = Instantiate(prefab, transform);
         c.transform.position = pos;
-        c.transform.rotation = Random.rotation;
+        c.transform.rotation = UnityEngine.Random.rotation;
         capsules.Add(c);
     }
 
@@ -77,7 +111,7 @@ public class ObjectGenerator : MonoBehaviour
     void Generate()
     {
         Clear();
-        foreach(var d in foams.GetTransformData())
+        foreach (var d in foams.GetTransformData())
         {
             var c = Instantiate(prefab, transform);
             c.transform.localPosition = d.localPosition;
@@ -99,4 +133,7 @@ public class ObjectGenerator : MonoBehaviour
         Gizmos.DrawWireCube(center, size);
         Gizmos.DrawWireSphere(obstacle.transform.position, radius);
     }
+
+
+
 }

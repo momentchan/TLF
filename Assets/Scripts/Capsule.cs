@@ -6,7 +6,8 @@ public class Capsule : MonoBehaviour
 {
     public Rigidbody Rigidbody => rigidbody;
     public CapsuleCollider Collider => collider;
-
+    public Transform t;
+    public MeshRenderer MeshRenderer => renderer;
     CapsuleCollider collider;
     Rigidbody rigidbody;
     MeshRenderer renderer;

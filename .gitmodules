@@ -4,3 +4,6 @@
 [submodule "Assets/ScriptTemplates"]
 	path = Assets/ScriptTemplates
 	url = https://github.com/momentchan/unity-script-templates.git
+[submodule "Assets/Packages/AzureKinectPackage"]
+	path = Assets/Packages/AzureKinectPackage
+	url = https://github.com/momentchan/AzureKinectPackage.git
