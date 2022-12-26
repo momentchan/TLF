@@ -10,6 +10,7 @@ public class Main : MonoBehaviour
     [SerializeField] private Camera simulateCamera;
     [SerializeField] private Camera outputCamera;
     [SerializeField] private CameraMode mode;
+    private CameraMode preMode;
 
     void Update()
     {
@@ -38,9 +39,13 @@ public class Main : MonoBehaviour
                 break;
         }
 
+        if (preMode != mode)
+        {
 #if UNITY_EDITOR
-        GameViewUtility.TrySetSize(mode == CameraMode.Output ? "TLF Out" : "TLF Scene");
+            GameViewUtility.TrySetSize(mode == CameraMode.Output ? "TLF Out" : "TLF Scene");
 #endif
+            preMode = mode;
+        }
     }
 
 
