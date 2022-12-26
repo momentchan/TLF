@@ -1,25 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using mj.gist;
 using UnityEngine;
 
-public class Capsule : MonoBehaviour
+namespace TLF
 {
-    public Rigidbody Rigidbody => rigidbody;
-    public CapsuleCollider Collider => collider;
-    public Transform t;
-    public MeshRenderer MeshRenderer => renderer;
-    CapsuleCollider collider;
-    Rigidbody rigidbody;
-    MeshRenderer renderer;
-    private Vector3 initScale;
-    void Start()
+    public class Capsule : MonoBehaviour
     {
-        rigidbody = GetComponent<Rigidbody>();
-        renderer = GetComponent<MeshRenderer>();
-        initScale = transform.localScale;
-    }
-    public void SetMaterial(Material mat)
-    {
-        renderer.material = mat;
+        new Rigidbody rigidbody;
+        new MeshRenderer renderer;
+
+        private Block block;
+        private CapsuleController controller;
+
+        void Start()
+        {
+            rigidbody = GetComponent<Rigidbody>();
+            renderer = GetComponent<MeshRenderer>();
+            block = new Block(renderer);
+        }
+        public void Setup(CapsuleController controller)
+        {
+            this.controller = controller;
+        }
+
+        private void Update()
+        {
+            renderer.enabled = !controller.useDrawMesh;
+            rigidbody.mass = controller.mass;
+            rigidbody.drag = controller.drag;
+
+            block.SetFloat("_Speed", rigidbody.velocity.magnitude);
+            block.Apply();
+        }
     }
 }
