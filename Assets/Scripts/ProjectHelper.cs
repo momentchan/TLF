@@ -68,4 +68,9 @@ namespace TLF
             RightTop
         }
     }
+
+    public enum QuadType
+    {
+        Left, Right
+    }
 }
