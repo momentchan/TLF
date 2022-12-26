@@ -1,17 +1,21 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TLF
 {
     public class SceneController : MonoBehaviour
     {
-        [SerializeField] private GameObject container1;
-        [SerializeField] private GameObject container2;
+        [SerializeField] private Container container1;
+        [SerializeField] private Container container2;
         [SerializeField] private AnimationCurve curve;
 
         [SerializeField] private float duration = 5f;
         [SerializeField] private float offset = 15f;
+
+        public void ScaleUp()
+        {
+            container1.ScaleUp();
+        }
 
         public void MoveBoxes()
         {
@@ -33,6 +37,8 @@ namespace TLF
                 yield return null;
             }
             container1.transform.localPosition = Vector3.right * offset;
+            container1.CopyConentTo(container2);
+            container1.Reset();
 
             var temp = container1;
             container1 = container2;

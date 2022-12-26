@@ -5,27 +5,42 @@ namespace TLF
 {
     public class Container : MonoBehaviour
     {
-        [SerializeField] private float duration = 5f;
-        [SerializeField] private float moveDistance = -15f;
+        [SerializeField] private MeshRenderer outerBox;
+        [SerializeField] private float scaleUpTime = 2f;
+        [SerializeField] private float scaleUp = 1.05f;
+        public GameObject content;
 
-        public void SwitchContent()
+        public void CopyConentTo(Container c2)
         {
-            StartCoroutine(StartMove());
+            content.transform.parent = c2.transform;
+            content.transform.localPosition = Vector3.zero;
+
+            c2.content = content;
+            content = null;
         }
 
-        IEnumerator StartMove()
+        public void ScaleUp()
+        {
+            StartCoroutine(StartScaleUp());
+        }
+
+        IEnumerator StartScaleUp()
         {
             yield return null;
-
-            var lpos = transform.localPosition;
             var t = 0f;
-
-            while (t < duration)
+            while (t < scaleUpTime)
             {
                 t += Time.deltaTime;
-                transform.localPosition = lpos + Vector3.right * Mathf.Lerp(0, moveDistance, t / duration);
+                outerBox.transform.localScale = Vector3.one * Mathf.Lerp(1, scaleUp, t / scaleUpTime);
                 yield return null;
             }
+            outerBox.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        }
+
+        public void Reset()
+        {
+            outerBox.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            outerBox.transform.localScale = Vector3.one;
         }
     }
 }
