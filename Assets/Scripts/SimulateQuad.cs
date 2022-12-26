@@ -1,29 +1,32 @@
 ﻿using mj.gist;
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class SimulateQuad : MonoBehaviour
+namespace TLF
 {
-    [SerializeField] private QuadType type;
-    private Block _block;
-    public Block block
+    [ExecuteInEditMode]
+    public class SimulateQuad : MonoBehaviour
     {
-        get
+        [SerializeField] private QuadType type;
+        [SerializeField] private ProjectHelper helper;
+
+        private Block _block;
+        public Block block
         {
-            if (_block == null)
-                _block = new Block(GetComponent<MeshRenderer>());
-            return _block;
+            get
+            {
+                if (_block == null)
+                    _block = new Block(GetComponent<MeshRenderer>());
+                return _block;
+            }
+        }
+        private void Update()
+        {
+            block.SetMatrix("_Homography", helper.GetHomography(type));
+            block.Apply();
         }
     }
-
     public enum QuadType
     {
         Left, Right
-    }
-    
-    public void SetCoordinates(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
-    {
-        block.SetMatrix("_Homography", TransformHelper.ComputeHomography(p0, p1, p2, p3));
-        block.Apply();
     }
 }
