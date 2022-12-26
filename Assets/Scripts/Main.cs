@@ -3,54 +3,64 @@ using System.Collections.Generic;
 using mj.gist;
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class Main : MonoBehaviour
-{
-    [SerializeField] private Camera sceneCamera;
-    [SerializeField] private Camera simulateCamera;
-    [SerializeField] private Camera outputCamera;
-    [SerializeField] private CameraMode mode;
-    private CameraMode preMode;
-
-    void Update()
+namespace TLF {
+    [ExecuteInEditMode]
+    public class Main : MonoBehaviour
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        [Header("Cameras")]
+        [SerializeField] private Camera sceneCamera;
+        [SerializeField] private Camera simulateCamera;
+        [SerializeField] private Camera outputCamera;
+        [SerializeField] private CameraMode mode;
+        private CameraMode preMode;
+
+        [Header("Timeline")]
+        [SerializeField] private OutputController outputController;
+
+        void Update()
         {
-            mode = (CameraMode)((int)mode + 1 % 3);
+            SwitchCameraMode();
         }
 
-        switch (mode)
-        {
-            case CameraMode.Scene:
-                sceneCamera.enabled = true;
-                simulateCamera.enabled = false;
-                outputCamera.enabled = false;
-                break;
-            case CameraMode.Simulation:
-                sceneCamera.enabled = false;
-                simulateCamera.enabled = true;
-                outputCamera.enabled = false;
-                break;
-            case CameraMode.Output:
-                sceneCamera.enabled = false;
-                simulateCamera.enabled = false;
-                outputCamera.enabled = true;
-                Screen.SetResolution(4096, 1792, false);
-                break;
-        }
+        private void SwitchCameraMode() {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                mode = (CameraMode)((int)mode + 1 % 3);
+            }
 
-        if (preMode != mode)
-        {
+            switch (mode)
+            {
+                case CameraMode.Scene:
+                    sceneCamera.enabled = true;
+                    simulateCamera.enabled = false;
+                    outputCamera.enabled = false;
+                    break;
+                case CameraMode.Simulation:
+                    sceneCamera.enabled = false;
+                    simulateCamera.enabled = true;
+                    outputCamera.enabled = false;
+                    break;
+                case CameraMode.Output:
+                    sceneCamera.enabled = false;
+                    simulateCamera.enabled = false;
+                    outputCamera.enabled = true;
+                    Screen.SetResolution(4096, 1792, false);
+                    break;
+            }
+
+            if (preMode != mode)
+            {
 #if UNITY_EDITOR
-            GameViewUtility.TrySetSize(mode == CameraMode.Output ? "TLF Out" : "TLF Scene");
+                GameViewUtility.TrySetSize(mode == CameraMode.Output ? "TLF Out" : "TLF Scene");
 #endif
-            preMode = mode;
+                preMode = mode;
+            }
         }
-    }
 
 
-    public enum CameraMode
-    {
-        Scene, Simulation, Output
+        public enum CameraMode
+        {
+            Scene, Simulation, Output
+        }
     }
 }
