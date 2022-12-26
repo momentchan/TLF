@@ -9,6 +9,9 @@ using UnityEngine.Jobs;
 
 namespace TLF
 {
+    /// <summary>
+    /// TODO: refactoring
+    /// </summary>
     public class CapsuleController : MonoBehaviour
     {
         [SerializeField] private Capsule prefab;

@@ -8,6 +8,9 @@ using UnityEngine.Jobs;
 
 namespace TLF
 {
+    /// <summary>
+    /// TODO: refactoring
+    /// </summary>
     public class ObjectRenderer : MonoBehaviour
     {
         private NativeArray<Matrix4x4> matrices;
