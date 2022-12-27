@@ -45,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerIndex: 0
-  objectPrefab: {fileID: 5939412584761960346, guid: 782693a6273407c4a92686fa6938fa63,
+  objectPrefab: {fileID: 1127087804698466222, guid: 9bb33c4a90600e441b2a9c96645ecbd7,
     type: 3}
   trackObjects: []

@@ -1,4 +1,5 @@
 using mj.gist;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace TLF
@@ -7,10 +8,10 @@ namespace TLF
     public class Capsule : MonoBehaviour
     {
         [SerializeField] private CapsuleController controller;
-        [SerializeField] private float seed; 
+        [SerializeField] private float seed;
 
         new Rigidbody rigidbody;
-        new MeshRenderer renderer;
+        [SerializeField] private MeshRenderer renderer;
 
         private Block block;
 
@@ -23,17 +24,18 @@ namespace TLF
         public void Setup(CapsuleController controller)
         {
             this.controller = controller;
-            this.seed = Random.value;
+            this.seed = UnityEngine.Random.value;
         }
 
         private void Update()
         {
             transform.localScale = controller.GetScale(seed);
+            if (!Application.isPlaying) return;
 
             rigidbody.mass = controller.mass;
             rigidbody.drag = controller.drag;
 
-            block.SetFloat("_Speed", rigidbody.velocity.magnitude);
+            block.SetFloat("_EmissiveIntensity", controller.GetEmissionIntensiy(rigidbody.velocity.magnitude));
             block.Apply();
         }
     }
