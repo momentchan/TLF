@@ -3,12 +3,16 @@ using UnityEngine;
 
 namespace TLF
 {
+    [ExecuteInEditMode]
     public class BoxContainer : MonoBehaviour
     {
-        [SerializeField] private MeshRenderer outerBox;
-        [SerializeField] private float scaleUpTime = 2f;
-        [SerializeField] private float scaleUp = 1.05f;
+        [SerializeField] private MeshRenderer box;
+
+        private SceneController controller;
         public GameObject content;
+
+        public void Setup(SceneController controller)
+            => this.controller = controller;
 
         public void CopyConentTo(BoxContainer c2)
         {
@@ -18,29 +22,30 @@ namespace TLF
             c2.content = content;
             content = null;
         }
-
-        public void ScaleUp()
+        public void ZoomIn()
         {
-            StartCoroutine(StartScaleUp());
+            StartCoroutine(StartZoomIn());
         }
 
-        IEnumerator StartScaleUp()
+        private IEnumerator StartZoomIn()
         {
             yield return null;
             var t = 0f;
-            while (t < scaleUpTime)
+            var initPos = box.transform.position;
+            while (t < controller.ZoomInT)
             {
                 t += Time.deltaTime;
-                outerBox.transform.localScale = Vector3.one * Mathf.Lerp(1, scaleUp, t / scaleUpTime);
+                box.transform.position = controller.GetZoomInPosition(initPos, t);
                 yield return null;
             }
-            outerBox.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            box.gameObject.SetActive(false);
+            box.transform.position = initPos;
         }
 
         public void Reset()
         {
-            outerBox.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            outerBox.transform.localScale = Vector3.one;
+            box.gameObject.SetActive(true);
+            box.transform.localScale = Vector3.one;
         }
     }
 }

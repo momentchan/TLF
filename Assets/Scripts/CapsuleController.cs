@@ -17,7 +17,8 @@ namespace TLF
         [SerializeField] FoamTransformDataset foams;
         [SerializeField] private Capsule prefab;
         [SerializeField] private PhysicMaterial physicMat;
-        [SerializeField] public int length = 10;
+        [SerializeField] private bool generate;
+        [SerializeField] private int length = 10;
 
         [SerializeField] Bounds bounds;
 
@@ -32,7 +33,6 @@ namespace TLF
         [SerializeField] private float staticFriction = 0.6f;
         [SerializeField] private float dynamicFriction = 0.6f;
         [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
-
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
         public Vector3 GetScale(float seed) => size * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
@@ -40,7 +40,8 @@ namespace TLF
 
         void Awake()
         {
-            //CreateCapsules();
+            if (generate)
+                CreateCapsules();
         }
 
         public float4x4 GetStickMatrix(float4x4 xform, int id)

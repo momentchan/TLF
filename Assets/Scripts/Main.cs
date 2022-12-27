@@ -8,10 +8,10 @@ namespace TLF {
     public class Main : MonoBehaviour
     {
         [Header("Cameras")]
+        [SerializeField] private CameraMode mode;
         [SerializeField] private Camera sceneCamera;
         [SerializeField] private Camera simulateCamera;
         [SerializeField] private Camera outputCamera;
-        [SerializeField] private CameraMode mode;
         private CameraMode preMode;
 
         [Header("Timeline")]
@@ -25,7 +25,7 @@ namespace TLF {
         private void SwitchCameraMode() {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                mode = (CameraMode)((int)mode + 1 % 3);
+                mode = (CameraMode)(((int)mode + 1) % 3);
             }
 
             switch (mode)

@@ -5,17 +5,34 @@ namespace TLF
 {
     public class SceneController : MonoBehaviour
     {
+        [SerializeField] private Transform sceneCam;
         [SerializeField] private BoxContainer container1;
         [SerializeField] private BoxContainer container2;
         [SerializeField] private ToyContainer toyContainer;
-        [SerializeField] private AnimationCurve curve;
 
-        [SerializeField] private float duration = 5f;
+        [Header("Movement")]
+        [SerializeField] private AnimationCurve moveCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] private float moveT = 5f;
         [SerializeField] private float offset = 15f;
+
+        [Header("Expansion")]
+        [SerializeField] private AnimationCurve zoomInCurve;
+        [SerializeField] private float zoomInT = 2f;
+        [SerializeField] private float zoomInRatio = 0.6f;
+
+        public float ZoomInT => zoomInT;
+        public Vector3 GetZoomInPosition(Vector3 from, float t)
+            => Vector3.Lerp(from, sceneCam.position, zoomInCurve.Evaluate(t / zoomInT) * zoomInRatio);
+
+        private void Start()
+        {
+            container1.Setup(this);
+            container2.Setup(this);
+        }
 
         public void ScaleUp()
         {
-            container1.ScaleUp();
+            container1.ZoomIn();
         }
 
         public void MoveBoxes()
@@ -29,10 +46,10 @@ namespace TLF
 
             var t = 0f;
 
-            while (t < duration)
+            while (t < moveT)
             {
                 t += Time.deltaTime;
-                var dist = -Mathf.Lerp(0, offset, curve.Evaluate(t / duration));
+                var dist = -Mathf.Lerp(0, offset, moveCurve.Evaluate(t / moveT));
                 container1.transform.localPosition = Vector3.right * dist;
                 container2.transform.localPosition = Vector3.right * (offset + dist);
                 yield return null;
@@ -47,5 +64,7 @@ namespace TLF
 
             toyContainer.SwitchToy();
         }
+
+
     }
 }
