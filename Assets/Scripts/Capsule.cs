@@ -1,16 +1,18 @@
-using System;
 using mj.gist;
 using UnityEngine;
 
 namespace TLF
 {
+    [ExecuteInEditMode]
     public class Capsule : MonoBehaviour
     {
+        [SerializeField] private CapsuleController controller;
+        [SerializeField] private float seed; 
+
         new Rigidbody rigidbody;
         new MeshRenderer renderer;
 
         private Block block;
-        private CapsuleController controller;
 
         void Start()
         {
@@ -21,11 +23,13 @@ namespace TLF
         public void Setup(CapsuleController controller)
         {
             this.controller = controller;
+            this.seed = Random.value;
         }
 
         private void Update()
         {
-            renderer.enabled = !controller.useDrawMesh;
+            transform.localScale = controller.GetScale(seed);
+
             rigidbody.mass = controller.mass;
             rigidbody.drag = controller.drag;
 

@@ -17,7 +17,6 @@ public class FoamTransformDataset : ScriptableObject
             {
                 localPosition = t.localPosition,
                 localRotation = t.localRotation,
-                localScale = t.localScale
             }).ToList();
         EditorUtility.SetDirty(this);
         AssetDatabase.SaveAssets();
@@ -29,6 +28,5 @@ public class FoamTransformDataset : ScriptableObject
     {
         public Vector3 localPosition;
         public Quaternion localRotation;
-        public Vector3 localScale;
     }
 }

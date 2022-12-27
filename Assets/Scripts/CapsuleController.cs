@@ -14,46 +14,31 @@ namespace TLF
     /// </summary>
     public class CapsuleController : MonoBehaviour
     {
+        [SerializeField] FoamTransformDataset foams;
         [SerializeField] private Capsule prefab;
-        [SerializeField] private Vector3 center;
-        [SerializeField] private Vector3 size = Vector3.one;
+        [SerializeField] public int length = 10;
+
+        [SerializeField] public int count = 1024;
+        [SerializeField] Bounds bounds;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
-        [SerializeField] private GameObject obstacle;
-        [SerializeField] private float radius = 1;
-        [SerializeField] private float spawnRate = 0.2f;
-        [SerializeField] public int maxCount = 100;
         [SerializeField] private PhysicMaterial physicMat;
         [SerializeField] private Material renderMat;
         [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
+
         [SerializeField] public float mass = 1f;
         [SerializeField] public float drag = 2f;
         [SerializeField] private float staticFriction = 0.6f;
         [SerializeField] private float dynamicFriction = 0.6f;
 
-        [SerializeField] FoamTransformDataset foams;
-        public TransformAccessArray Trs => trs;
-        protected TransformAccessArray trs;
-        [SerializeField] public bool useDrawMesh = true;
-        [SerializeField] ObjectRenderer r;
-        public List<Matrix4x4> matricess = new List<Matrix4x4>();
+        [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
+        [SerializeField] private Vector3 size = Vector3.one;
+        public Vector3 GetScale(float seed) => size * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
 
         void Awake()
         {
-            trs = new TransformAccessArray(0);
-            for (var i = 0; i < maxCount; i++)
-            {
-                trs.Add(capsules[i].transform);
-                matricess.Add(capsules[i].transform.localToWorldMatrix);
-            }
-            foreach(var c in capsules)
-            {
-                c.Setup(this);
-            }
+            //CreateCapsules();
         }
-        private void OnDestroy()
-        {
-            trs.Dispose();
-        }
+
         public float4x4 GetStickMatrix(float4x4 xform, int id)
         {
             var capsule = capsules[id];
@@ -61,23 +46,8 @@ namespace TLF
             var m2 = float4x4.EulerXYZ(capsule.transform.localRotation.eulerAngles);
             return math.mul(math.mul(xform, m1), m2);
         }
-        IEnumerator G()
-        {
-            Clear();
-            yield return null;
-            while(capsules.Count< maxCount)
-            {
-                RandomGenerate();
-                yield return new WaitForSeconds(0.05f);
-            }
-        }
-
         void Update()
         {
-            r.enabled = useDrawMesh;
-
-            if (Input.GetKeyDown(KeyCode.G))
-                RandomGenerate();
             if (Input.GetKeyDown(KeyCode.C))
                 Clear();
 
@@ -86,24 +56,35 @@ namespace TLF
             physicMat.dynamicFriction = dynamicFriction;
         }
 
-        void RandomGenerate()
+        private void CreateCapsules()
         {
-            var pos = Vector3.zero;
-            for (var i = 0; i < 20; i++)
-            {
-                pos = center + new Vector3(
-                    Mathf.Lerp(-0.5f, 0.5f, UnityEngine.Random.value) * size.x,
-                    Mathf.Lerp(0.2f, 0.4f, UnityEngine.Random.value) * size.y,
-                    Mathf.Lerp(-0.5f, 0.5f, UnityEngine.Random.value) * size.z);
+            Clear();
+            for (var i = 0; i < length; i++)
+                for (var j = 0; j < length; j++)
+                    for (var k = 0; k < length; k++)
+                    {
+                        var pos = bounds.center + new Vector3(
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * i / length) * bounds.size.x,
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * j / length) * bounds.size.y,
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * k / length) * bounds.size.z);
 
-                var op = obstacle.transform.position;
-                if (Vector2.Distance(new Vector2(pos.x, pos.z), new Vector2(op.x, op.z)) > radius)
-                    break;
-            }
+                        CreateCapsule(pos, UnityEngine.Random.rotation);
+                    }
+        }
 
+        [ContextMenu("Generate")]
+        private void CreateCapsulesFromDataset()
+        {
+            Clear();
+            foreach (var d in foams.GetTransformData())
+                CreateCapsule(d.localPosition, d.localRotation);
+        }
+
+        private void CreateCapsule(Vector3 pos, Quaternion rot)
+        {
             var c = Instantiate(prefab, transform);
             c.transform.position = pos;
-            c.transform.rotation = UnityEngine.Random.rotation;
+            c.transform.rotation = rot;
             c.Setup(this);
             capsules.Add(c);
         }
@@ -112,20 +93,6 @@ namespace TLF
         void SaveTransform()
         {
             foams.SaveTransform(capsules.Select(c => c.transform).ToList());
-        }
-
-        [ContextMenu("Generate")]
-        void Generate()
-        {
-            Clear();
-            foreach (var d in foams.GetTransformData())
-            {
-                var c = Instantiate(prefab, transform);
-                c.transform.localPosition = d.localPosition;
-                c.transform.localRotation = d.localRotation;
-                c.transform.localScale = d.localScale;
-                capsules.Add(c);
-            }
         }
 
         void Clear()
@@ -137,8 +104,7 @@ namespace TLF
 
         private void OnDrawGizmos()
         {
-            Gizmos.DrawWireCube(center, size);
-            Gizmos.DrawWireSphere(obstacle.transform.position, radius);
+            Gizmos.DrawWireCube(bounds.center, bounds.size);
         }
     }
 }
