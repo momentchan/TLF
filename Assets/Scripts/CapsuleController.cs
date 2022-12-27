@@ -61,7 +61,16 @@ namespace TLF
             var m2 = float4x4.EulerXYZ(capsule.transform.localRotation.eulerAngles);
             return math.mul(math.mul(xform, m1), m2);
         }
-
+        IEnumerator G()
+        {
+            Clear();
+            yield return null;
+            while(capsules.Count< maxCount)
+            {
+                RandomGenerate();
+                yield return new WaitForSeconds(0.05f);
+            }
+        }
 
         void Update()
         {
@@ -95,6 +104,7 @@ namespace TLF
             var c = Instantiate(prefab, transform);
             c.transform.position = pos;
             c.transform.rotation = UnityEngine.Random.rotation;
+            c.Setup(this);
             capsules.Add(c);
         }
 
