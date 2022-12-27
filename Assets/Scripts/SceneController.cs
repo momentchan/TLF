@@ -5,8 +5,9 @@ namespace TLF
 {
     public class SceneController : MonoBehaviour
     {
-        [SerializeField] private Container container1;
-        [SerializeField] private Container container2;
+        [SerializeField] private BoxContainer container1;
+        [SerializeField] private BoxContainer container2;
+        [SerializeField] private ToyContainer toyContainer;
         [SerializeField] private AnimationCurve curve;
 
         [SerializeField] private float duration = 5f;
@@ -43,6 +44,8 @@ namespace TLF
             var temp = container1;
             container1 = container2;
             container2 = temp;
+
+            toyContainer.SwitchToy();
         }
     }
 }
