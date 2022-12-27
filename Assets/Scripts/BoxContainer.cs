@@ -31,21 +31,22 @@ namespace TLF
         {
             yield return null;
             var t = 0f;
-            var initPos = box.transform.position;
+            var initPos = transform.position;
             while (t < controller.ZoomInT)
             {
                 t += Time.deltaTime;
-                box.transform.position = controller.GetZoomInPosition(initPos, t);
+                transform.position = controller.GetZoomInPosition(initPos, t);
+
+                if (t / controller.ZoomInT > controller.ZoomInHideRatio)
+                    box.gameObject.SetActive(false);
+
                 yield return null;
             }
-            box.gameObject.SetActive(false);
-            box.transform.position = initPos;
         }
 
         public void Reset()
         {
             box.gameObject.SetActive(true);
-            box.transform.localScale = Vector3.one;
         }
     }
 }

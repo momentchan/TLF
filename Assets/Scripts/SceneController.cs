@@ -18,11 +18,14 @@ namespace TLF
         [Header("Expansion")]
         [SerializeField] private AnimationCurve zoomInCurve;
         [SerializeField] private float zoomInT = 2f;
-        [SerializeField] private float zoomInRatio = 0.6f;
+        [SerializeField] private float zoomInDistRatio = 0.1f;
+        [SerializeField] private float zoomInHideRatio = 0.7f;
 
         public float ZoomInT => zoomInT;
+        public float ZoomInHideRatio => zoomInHideRatio;
         public Vector3 GetZoomInPosition(Vector3 from, float t)
-            => Vector3.Lerp(from, sceneCam.position, zoomInCurve.Evaluate(t / zoomInT) * zoomInRatio);
+            => Vector3.Lerp(from, sceneCam.position, zoomInCurve.Evaluate(t / zoomInT) * zoomInDistRatio);
+
 
         private void Start()
         {
@@ -45,13 +48,14 @@ namespace TLF
             yield return null;
 
             var t = 0f;
-
+            var initPos1 = container1.transform.localPosition;
+            var initPos2 = container2.transform.localPosition;
             while (t < moveT)
             {
                 t += Time.deltaTime;
                 var dist = -Mathf.Lerp(0, offset, moveCurve.Evaluate(t / moveT));
-                container1.transform.localPosition = Vector3.right * dist;
-                container2.transform.localPosition = Vector3.right * (offset + dist);
+                container1.transform.localPosition = initPos1 + Vector3.right * dist;
+                container2.transform.localPosition = initPos2 + Vector3.right * dist;
                 yield return null;
             }
             container1.transform.localPosition = Vector3.right * offset;
