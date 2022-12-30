@@ -14,6 +14,9 @@ namespace TLF
         [SerializeField] private float maxSpeed = 2;
         [SerializeField] private float speedPower = 1;
 
+        [Header("Color")]
+        [SerializeField] public float colorBlendRate = 0.001f;
+
         public Vector3 GetVelocityFactor(Vector3 velocity) 
             => Mathf.Pow(Mathf.Clamp01(velocity.magnitude / maxSpeed), speedPower) * velocity.normalized;
         

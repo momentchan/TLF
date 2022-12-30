@@ -20,6 +20,8 @@ namespace TLF
         private TrackerController controller;
         private float idleT = Mathf.Infinity;
         private MeshRenderer renderer;
+        private Tracker tracker;
+        public void Setup(Tracker tracker) => this.tracker = tracker;
 
         private Vector3 prevPos;
 
@@ -49,7 +51,7 @@ namespace TLF
                     var c = collider.GetComponent<Capsule>();
                     if (c != null)
                     {
-                        c.AddForce(transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity));
+                        c.AddForce(transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity), tracker.color);
                     }
                 }
             }

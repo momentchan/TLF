@@ -27,6 +27,7 @@ namespace TLF
         [SerializeField] private Vector3 size = Vector3.one;
         [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
         [SerializeField] private Vector2 speedRange = new Vector2(0, 0.1f);
+        [SerializeField, ColorUsage(true, true)] private Color emissiveColor;
 
         [Header("Physics")]
         [SerializeField] public float mass = 1f;
@@ -37,10 +38,10 @@ namespace TLF
         [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
         [SerializeField, Range(0, 1)] public float speedSmooth = 0.5f;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
-
         
         public Vector3 GetScale(float seed) => size * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
         public float GetEmissionIntensiy(float speed) => math.remap(speedRange.x, speedRange.y, 0, 1, speed);
+        public Color GetEmissiveColor() => emissiveColor;
 
         void Awake()
         {
