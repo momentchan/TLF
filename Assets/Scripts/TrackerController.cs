@@ -20,14 +20,28 @@ namespace TLF
         [SerializeField] private Vector2 interactiveRange = new Vector2(0.5f, 0.8f);
         [SerializeField] private Vector2 heightRange;
         [SerializeField] private Vector3 projectRange = new Vector3(10, 2, 1);
+        [SerializeField] private bool renderObject;
+        public bool RenderObject => renderObject;
         public Vector3 ProjectRange => projectRange;
+
+        public float ObjectScale => objectScale;
 
         [SerializeField] private float objectScale = 1f;
         [SerializeField] private float angle = 25f;
+        [SerializeField] private float maxIdleTime = 2f;
+        public float MaxIdleTime => maxIdleTime;
+
 
         [SerializeField] private List<Tracker> trackers = new List<Tracker>();
 
         public readonly int TRACK_OBJECT_NUM = 3;
+
+        public Vector3 GetPositionOnCurve(Vector2 uv)
+        {
+            var pos = bezier.data.Position(uv.x);
+            pos.y += Mathf.Lerp(heightRange.x, heightRange.y, interactiveRange.Interpolate(uv.y));
+            return pos;
+        }
 
         private void Start()
         {
@@ -38,30 +52,6 @@ namespace TLF
                 trackers.Add(tracker);
             }
         }
-        //void Update()
-        //{
-        //    for (var i = 0; i < maxTrackers; i++)
-        //    {
-        //            for (var j = 0; j < avatar.Joints.Count; j++)
-        //            {
-        //                //var joint = avatar.Joints[j];
-        //                //var trackObject = tracker.trackObjects[j];
-        //                //var viewPos = joint.ViewPos;
-        //                //if (joint.IsActive && interactiveRange.IsInside(viewPos.y))
-        //                //{
-        //                //    var pos = bezier.data.Position(joint.ViewPos.x);
-        //                //    pos.y += Mathf.Lerp(heightRange.x, heightRange.y, interactiveRange.Interpolate(viewPos.y));
-        //                //    trackObject.transform.position = pos;
-        //                //    trackObject.transform.localScale = Vector3.one * objectScale;
-        //                //    trackObject.SetActive(true);
-        //                //}
-        //                //else
-        //                //{
-        //                //    trackObject.SetActive(false);
-        //                //}
-        //            }
-        //    }
-        //}
 
         public virtual void OscMessageReceived(OscPort.Capsule e)
         {
@@ -73,20 +63,25 @@ namespace TLF
             var y = (float)e.message.data[4];
             var z = (float)e.message.data[5];
 
-            
             var trackObject = trackers[playerId].trackObjects[jointId];
+            trackObject.jointType = type;
 
             var pos = new Vector3(x, y, -z);
             var wPos = Quaternion.AngleAxis(angle, Vector3.up) * pos + projectPlane.position;
 
             var dir = Vector3.ProjectOnPlane(wPos, -projectPlane.forward);
-            var projPos= new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
+            var projPos = new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
 
-            var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.one * 0.5f;
+            var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.right * 0.5f;
 
             trackObject.worldPos = wPos;
             trackObject.projectedPos = projPos;
             trackObject.normalizeProjectedPos = nmlProjPos;
+
+            trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
+            trackObject.transform.localScale = ObjectScale * Vector3.one;
+
+            trackObject.Activate();
         }
 
         private void OnDrawGizmos()

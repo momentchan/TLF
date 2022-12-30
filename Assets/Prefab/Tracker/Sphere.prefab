@@ -111,6 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugSize: 0.2
+  jointType: 0
   worldColor: {r: 1, g: 0, b: 0, a: 0.5019608}
   projectColor: {r: 0, g: 1, b: 0, a: 0.5019608}
   worldPos: {x: 0, y: 0, z: 0}
