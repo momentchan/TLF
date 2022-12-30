@@ -57,6 +57,7 @@ namespace TLF
         {
             var playerId = (int)e.message.data[0];
             var type = (KinectInterop.JointType)e.message.data[1];
+            if (type == KinectInterop.JointType.Head) return;
             var jointId = (int)e.message.data[2];
 
             var x = (float)e.message.data[3];

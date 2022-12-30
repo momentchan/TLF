@@ -19,30 +19,46 @@ namespace TLF
 
         private TrackerController controller;
         private float idleT = Mathf.Infinity;
-        private Collider collider;
         private MeshRenderer renderer;
+
+        private Vector3 prevPos;
 
         private void Start()
         {
             controller = TrackerController.Instance;
-            collider = GetComponent<Collider>();
             renderer = GetComponent<MeshRenderer>();
+            prevPos = transform.position;
         }
 
         private void Update()
         {
             idleT += Time.deltaTime;
-            SetActive(idleT < controller.MaxIdleTime);
+
+            var active = idleT < controller.MaxIdleTime;
+            SetActive(active);
+
+            var velocity = (transform.position - prevPos) / Time.deltaTime;
+            prevPos = transform.position;
+
+            if (active)
+            {
+                var colliders = Physics.OverlapSphere(transform.position, controller.ObjectScale);
+
+                foreach (var collider in colliders)
+                {
+                    var c = collider.GetComponent<Capsule>();
+                    if (c != null)
+                    {
+                        c.AddForce(transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity));
+                    }
+                }
+            }
         }
 
-        public void Activate()
-        {
-            idleT = 0;
-        }
+        public void Activate() => idleT = 0;
 
         private void SetActive(bool active)
         {
-            collider.enabled = active;
             renderer.enabled = active && controller.RenderObject;
         }
 

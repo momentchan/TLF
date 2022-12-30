@@ -14,17 +14,21 @@ namespace TLF
         [SerializeField] private MeshRenderer renderer;
 
         private Block block;
+        private float speed;
 
         void Start()
         {
             rigidbody = GetComponent<Rigidbody>();
             renderer = GetComponent<MeshRenderer>();
             block = new Block(renderer);
-        }
-        public void Setup(CapsuleController controller)
-        {
-            this.controller = controller;
             this.seed = UnityEngine.Random.value;
+            controller = CapsuleController.Instance;
+        }
+
+        public void AddForce(Vector3 pos, Vector3 vel)
+        {
+            var dir = transform.position - pos;
+            rigidbody.AddForce(InteractiveEffect.Instance.GetForce(dir, vel));
         }
 
         private void Update()
@@ -34,8 +38,11 @@ namespace TLF
 
             rigidbody.mass = controller.mass;
             rigidbody.drag = controller.drag;
+            rigidbody.angularDrag = controller.angularDrag;
 
-            block.SetFloat("_EmissiveIntensity", controller.GetEmissionIntensiy(rigidbody.velocity.magnitude));
+            speed = Mathf.Lerp(rigidbody.velocity.magnitude, speed, controller.speedSmooth);
+
+            block.SetFloat("_EmissiveIntensity", controller.GetEmissionIntensiy(speed));
             block.Apply();
         }
     }

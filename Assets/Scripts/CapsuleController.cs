@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using mj.gist;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -12,7 +13,7 @@ namespace TLF
     /// <summary>
     /// TODO: refactoring
     /// </summary>
-    public class CapsuleController : MonoBehaviour
+    public class CapsuleController : SingletonMonoBehaviour<CapsuleController>
     {
         [SerializeField] FoamTransformDataset foams;
         [SerializeField] private Capsule prefab;
@@ -30,11 +31,14 @@ namespace TLF
         [Header("Physics")]
         [SerializeField] public float mass = 1f;
         [SerializeField] public float drag = 2f;
+        [SerializeField] public float angularDrag = 0.05f;
         [SerializeField] private float staticFriction = 0.6f;
         [SerializeField] private float dynamicFriction = 0.6f;
         [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
+        [SerializeField, Range(0, 1)] public float speedSmooth = 0.5f;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
+        
         public Vector3 GetScale(float seed) => size * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
         public float GetEmissionIntensiy(float speed) => math.remap(speedRange.x, speedRange.y, 0, 1, speed);
 
@@ -90,7 +94,6 @@ namespace TLF
             var c = Instantiate(prefab, transform);
             c.transform.position = pos;
             c.transform.rotation = rot;
-            c.Setup(this);
             capsules.Add(c);
         }
 
