@@ -2,20 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tracker : MonoBehaviour
+namespace TLF
 {
-    public int playerIndex;
-    [SerializeField] private GameObject objectPrefab;
-
-    public List<GameObject> trackObjects = new List<GameObject>();
-    public void SetUp(int userId, int objectNum)
+    public class Tracker : MonoBehaviour
     {
-        this.playerIndex = userId;
-        for (var i = 0; i < objectNum; i++)
+        [SerializeField] private TrackerObject objectPrefab;
+        public int playerIndex;
+
+        public List<TrackerObject> trackObjects = new List<TrackerObject>();
+
+        public void Setup(int userId)
         {
-            var go = Instantiate(objectPrefab, transform);
-            go.SetActive(false);
-            trackObjects.Add(go);
+            this.playerIndex = userId;
+        }
+
+        private void Start()
+        {
+            for (var i = 0; i < TrackerController.Instance.TRACK_OBJECT_NUM; i++)
+            {
+                var o = Instantiate(objectPrefab, transform);
+                trackObjects.Add(o);
+            }
         }
     }
 }

@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b6bcc7147e41cd4687e2516b728567e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndex: 0
-  objectPrefab: {fileID: 1127087804698466222, guid: 9bb33c4a90600e441b2a9c96645ecbd7,
+  objectPrefab: {fileID: -5876018754267072365, guid: 9bb33c4a90600e441b2a9c96645ecbd7,
     type: 3}
+  playerIndex: 0
   trackObjects: []

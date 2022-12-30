@@ -1,67 +1,99 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using BezierTools;
-using mj.gist.tracking;
+using com.rfilkov.kinect;
+using mj.gist;
+using Osc;
 using UnityEngine;
 
-public class TrackerController : MonoBehaviour
+namespace TLF
 {
-    [SerializeField] Bezier bezier;
-    [SerializeField, Range(0, 1)] private float rate = 0;
-    [SerializeField] private int maxTrackers = 10;
-    [SerializeField] private Tracker trackerPrefab;
-    [SerializeField] private UserMatcher matcher;
-    [SerializeField] private Vector2 interactiveRange = new Vector2(0.5f, 0.8f);
-    [SerializeField] private Vector2 heightRange;
-    [SerializeField] private List<Tracker> trackers = new List<Tracker>();
-    [SerializeField] private float objectScale = 1f;
-
-    private void Start()
+    public class TrackerController : SingletonMonoBehaviour<TrackerController>
     {
-        for (var i = 0; i < maxTrackers; i++)
-        {
-            var tracker = Instantiate(trackerPrefab, transform);
-            tracker.SetUp(i, matcher.avatarModel.JointsNumer);
-            trackers.Add(tracker);
-        }
-    }
+        public Transform ProjectPlane => projectPlane;
 
-    void Update()
-    {
-        for (var i = 0; i < maxTrackers; i++)
+        [SerializeField] private Bezier bezier;
+        [SerializeField] private Transform projectPlane;
+        [SerializeField] private Tracker trackerPrefab;
+
+        [SerializeField, Range(0, 1)] private float rate = 0;
+        [SerializeField] private int maxTrackers = 10;
+        [SerializeField] private Vector2 interactiveRange = new Vector2(0.5f, 0.8f);
+        [SerializeField] private Vector2 heightRange;
+        [SerializeField] private Vector3 projectRange = new Vector3(10, 2, 1);
+        public Vector3 ProjectRange => projectRange;
+
+        [SerializeField] private float objectScale = 1f;
+        [SerializeField] private float angle = 25f;
+
+        [SerializeField] private List<Tracker> trackers = new List<Tracker>();
+
+        public readonly int TRACK_OBJECT_NUM = 3;
+
+        private void Start()
         {
-            var avatar = matcher.GetUser(i);
-            var tracker = trackers[i];
-            tracker.gameObject.SetActive(avatar != null);
-            if (avatar != null)
+            for (var i = 0; i < maxTrackers; i++)
             {
-                for (var j = 0; j < avatar.Joints.Count; j++)
-                {
-                    var joint = avatar.Joints[j];
-                    var trackObject = tracker.trackObjects[j];
-                    var viewPos = joint.ViewPos;
-                    if (joint.IsActive && interactiveRange.IsInside(viewPos.y))
-                    {
-                        var pos = bezier.data.Position(joint.ViewPos.x);
-                        pos.y += Mathf.Lerp(heightRange.x, heightRange.y, interactiveRange.Interpolate(viewPos.y));
-                        trackObject.transform.position = pos;
-                        trackObject.transform.localScale = Vector3.one * objectScale;
-                        trackObject.SetActive(true);
-                    }
-                    else
-                    {
-                        trackObject.SetActive(false);
-                    }
-                }
+                var tracker = Instantiate(trackerPrefab, transform);
+                tracker.Setup(i);
+                trackers.Add(tracker);
             }
         }
-    }
+        //void Update()
+        //{
+        //    for (var i = 0; i < maxTrackers; i++)
+        //    {
+        //            for (var j = 0; j < avatar.Joints.Count; j++)
+        //            {
+        //                //var joint = avatar.Joints[j];
+        //                //var trackObject = tracker.trackObjects[j];
+        //                //var viewPos = joint.ViewPos;
+        //                //if (joint.IsActive && interactiveRange.IsInside(viewPos.y))
+        //                //{
+        //                //    var pos = bezier.data.Position(joint.ViewPos.x);
+        //                //    pos.y += Mathf.Lerp(heightRange.x, heightRange.y, interactiveRange.Interpolate(viewPos.y));
+        //                //    trackObject.transform.position = pos;
+        //                //    trackObject.transform.localScale = Vector3.one * objectScale;
+        //                //    trackObject.SetActive(true);
+        //                //}
+        //                //else
+        //                //{
+        //                //    trackObject.SetActive(false);
+        //                //}
+        //            }
+        //    }
+        //}
 
-    private void OnDrawGizmos()
-    {
-        var pos = bezier.data.Position(rate);
-        Gizmos.DrawWireSphere(pos, 0.5f);
-        Gizmos.DrawLine(pos + Vector3.up * heightRange.x, pos + Vector3.up * heightRange.y);
+        public virtual void OscMessageReceived(OscPort.Capsule e)
+        {
+            var playerId = (int)e.message.data[0];
+            var type = (KinectInterop.JointType)e.message.data[1];
+            var jointId = (int)e.message.data[2];
+
+            var x = (float)e.message.data[3];
+            var y = (float)e.message.data[4];
+            var z = (float)e.message.data[5];
+
+            
+            var trackObject = trackers[playerId].trackObjects[jointId];
+
+            var pos = new Vector3(x, y, -z);
+            var wPos = Quaternion.AngleAxis(angle, Vector3.up) * pos + projectPlane.position;
+
+            var dir = Vector3.ProjectOnPlane(wPos, -projectPlane.forward);
+            var projPos= new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
+
+            var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.one * 0.5f;
+
+            trackObject.worldPos = wPos;
+            trackObject.projectedPos = projPos;
+            trackObject.normalizeProjectedPos = nmlProjPos;
+        }
+
+        private void OnDrawGizmos()
+        {
+            var pos = bezier.data.Position(rate);
+            Gizmos.DrawWireSphere(pos, 0.5f);
+            Gizmos.DrawLine(pos + Vector3.up * heightRange.x, pos + Vector3.up * heightRange.y);
+        }
     }
 }
