@@ -62,7 +62,7 @@ namespace TLF
 
             if (active)
             {
-                var colliders = Physics.OverlapSphere(transform.position, controller.ObjectScale);
+                var colliders = Physics.OverlapSphere(transform.position, InteractiveEffect.Instance.Range);
 
                 foreach (var collider in colliders)
                 {

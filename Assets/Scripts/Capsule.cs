@@ -18,8 +18,14 @@ namespace TLF
 
         private Color emissiveColor;
 
+        private Vector3 initLocalPos;
+        private quaternion initLocalRot;
+
         void Start()
         {
+            initLocalPos = transform.localPosition;
+            initLocalRot = transform.localRotation;
+
             rigidbody = GetComponent<Rigidbody>();
             renderer = GetComponent<MeshRenderer>();
             block = new Block(renderer);
@@ -33,6 +39,12 @@ namespace TLF
             rigidbody.AddForce(InteractiveEffect.Instance.GetForce(dir, vel));
 
             emissiveColor = Color.Lerp(color, emissiveColor, InteractiveEffect.Instance.colorBlendRate);
+        }
+
+        public void Reset()
+        {
+            transform.localPosition = initLocalPos;
+            transform.localRotation = initLocalRot;
         }
 
         private void Update()

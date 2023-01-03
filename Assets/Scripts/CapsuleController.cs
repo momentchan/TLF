@@ -2,17 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using mj.gist;
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Jobs;
 
 namespace TLF
 {
-    /// <summary>
-    /// TODO: refactoring
-    /// </summary>
     public class CapsuleController : SingletonMonoBehaviour<CapsuleController>
     {
         [SerializeField] FoamTransformDataset foams;
@@ -27,7 +21,6 @@ namespace TLF
         [SerializeField] private Vector3 size = Vector3.one;
         [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
         [SerializeField] private Vector2 speedRange = new Vector2(0, 0.1f);
-        [SerializeField, ColorUsage(true, true)] private Color emissiveColor;
 
         [Header("Physics")]
         [SerializeField] public float mass = 1f;
@@ -38,29 +31,24 @@ namespace TLF
         [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
         [SerializeField, Range(0, 1)] public float speedSmooth = 0.5f;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
-        
+
         public Vector3 GetScale(float seed) => size * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
         public float GetEmissionIntensiy(float speed) => math.remap(speedRange.x, speedRange.y, 0, 1, speed);
-        public Color GetEmissiveColor() => emissiveColor;
 
-        void Awake()
+        protected override void Awake()
         {
             if (generate)
                 CreateCapsules();
         }
 
-        public float4x4 GetStickMatrix(float4x4 xform, int id)
+        public void Reset()
         {
-            var capsule = capsules[id];
-            var m1 = float4x4.Translate(capsule.transform.localPosition);
-            var m2 = float4x4.EulerXYZ(capsule.transform.localRotation.eulerAngles);
-            return math.mul(math.mul(xform, m1), m2);
+            foreach (var c in capsules)
+                c.Reset();
         }
+
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.C))
-                Clear();
-
             physicMat.bounciness = bounciness;
             physicMat.staticFriction = staticFriction;
             physicMat.dynamicFriction = dynamicFriction;

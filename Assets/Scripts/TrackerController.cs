@@ -24,9 +24,6 @@ namespace TLF
         public bool RenderObject => renderObject;
         public Vector3 ProjectRange => projectRange;
 
-        public float ObjectScale => objectScale;
-
-        [SerializeField] private float objectScale = 1f;
         [SerializeField] private float angle = 25f;
         [SerializeField] private float maxIdleTime = 2f;
         public float MaxIdleTime => maxIdleTime;
@@ -78,7 +75,7 @@ namespace TLF
             trackObject.UpdateData(uniqueId, type, wpos, projPos, nmlProjPos);
 
             trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
-            trackObject.transform.localScale = ObjectScale * Vector3.one;
+            trackObject.transform.localScale = InteractiveEffect.Instance.Range * Vector3.one;
         }
 
         private void OnDrawGizmos()
