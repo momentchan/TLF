@@ -5,17 +5,30 @@ using UnityEngine;
 
 namespace TLF {
     [ExecuteInEditMode]
-    public class Main : MonoBehaviour
+    public class Main : SingletonMonoBehaviour<Main>
     {
         [Header("Cameras")]
         [SerializeField] private CameraMode mode;
         [SerializeField] private Camera sceneCamera;
         [SerializeField] private Camera simulateCamera;
         [SerializeField] private Camera outputCamera;
-        private CameraMode preMode;
+         private CameraMode preMode;
+
+        public PlayMode Mode => playMode;
+        [SerializeField] private PlayMode playMode;
 
         [Header("Timeline")]
         [SerializeField] private OutputController outputController;
+
+        public void StartInteractive()
+        {
+            playMode = PlayMode.Interactive;
+        }
+
+        public void StartStatic()
+        {
+            playMode = PlayMode.Static;
+        }
 
         void Update()
         {
@@ -61,6 +74,10 @@ namespace TLF {
         public enum CameraMode
         {
             Scene, Simulation, Output
+        }
+        public enum PlayMode
+        {
+            Static, Interactive
         }
     }
 }

@@ -9,19 +9,37 @@ namespace TLF
     {
         public float debugSize = 0.2f;
 
-        [SerializeField] public KinectInterop.JointType jointType;
-        [SerializeField] private Color worldColor = Color.red;
-        [SerializeField] private Color projectColor = Color.green;
+        [SerializeField] private KinectInterop.JointType jointType;
+        [SerializeField] private int uniqueId;
 
-        public Vector3 worldPos;
-        public Vector3 projectedPos;
-        public Vector3 normalizeProjectedPos;
+        private Vector3 worldPos;
+        private Vector3 projectedPos;
+        private Vector3 normalizeProjectedPos;
 
         private TrackerController controller;
         private float idleT = Mathf.Infinity;
         private MeshRenderer renderer;
-        private Tracker tracker;
-        public void Setup(Tracker tracker) => this.tracker = tracker;
+
+        private Color emissiveColor;
+        private Color worldColor = Color.red;
+        private Color projectColor = Color.green;
+
+        public void UpdateData(int uniqueId, KinectInterop.JointType type, Vector3 wpos, Vector3 projPos, Vector3 nmlProjPos)
+        {
+            this.uniqueId = uniqueId;
+            jointType = type;
+
+            worldPos = wpos;
+            projectedPos = projPos;
+            normalizeProjectedPos = nmlProjPos;
+
+            idleT = 0;
+
+            RandomUtil.RandomState(() =>
+            {
+                emissiveColor = Random.ColorHSV(0, 1, 0.5f, 1f, 1f, 1f);
+            }, uniqueId);
+        }
 
         private Vector3 prevPos;
 
@@ -51,13 +69,11 @@ namespace TLF
                     var c = collider.GetComponent<Capsule>();
                     if (c != null)
                     {
-                        c.AddForce(transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity), tracker.color);
+                        c.AddForce(transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity), emissiveColor);
                     }
                 }
             }
         }
-
-        public void Activate() => idleT = 0;
 
         private void SetActive(bool active)
         {

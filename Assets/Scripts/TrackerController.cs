@@ -55,34 +55,30 @@ namespace TLF
 
         public virtual void OscMessageReceived(OscPort.Capsule e)
         {
-            var playerId = (int)e.message.data[0];
-            var type = (KinectInterop.JointType)e.message.data[1];
-            if (type == KinectInterop.JointType.Head) return;
-            var jointId = (int)e.message.data[2];
+            if (Main.Instance.Mode == Main.PlayMode.Static) return;
 
-            var x = (float)e.message.data[3];
-            var y = (float)e.message.data[4];
-            var z = (float)e.message.data[5];
+            var uniqueId = (int)e.message.data[0];
+            var playerId = (int)e.message.data[1];
+            var type = (KinectInterop.JointType)e.message.data[2];
+            if (type == KinectInterop.JointType.Head) return;
+            var jointId = (int)e.message.data[3];
+
+            var x = (float)e.message.data[4];
+            var y = (float)e.message.data[5];
+            var z = (float)e.message.data[6];
 
             var trackObject = trackers[playerId].trackObjects[jointId];
-            trackObject.jointType = type;
 
             var pos = new Vector3(x, y, -z);
-            var wPos = Quaternion.AngleAxis(angle, Vector3.up) * pos + projectPlane.position;
-
-            var dir = Vector3.ProjectOnPlane(wPos, -projectPlane.forward);
+            var wpos = Quaternion.AngleAxis(angle, Vector3.up) * pos + projectPlane.position;
+            var dir = Vector3.ProjectOnPlane(wpos, -projectPlane.forward);
             var projPos = new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
-
             var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.right * 0.5f;
 
-            trackObject.worldPos = wPos;
-            trackObject.projectedPos = projPos;
-            trackObject.normalizeProjectedPos = nmlProjPos;
+            trackObject.UpdateData(uniqueId, type, wpos, projPos, nmlProjPos);
 
             trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
             trackObject.transform.localScale = ObjectScale * Vector3.one;
-
-            trackObject.Activate();
         }
 
         private void OnDrawGizmos()
