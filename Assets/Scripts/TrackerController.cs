@@ -17,8 +17,8 @@ namespace TLF
 
         [SerializeField, Range(0, 1)] private float rate = 0;
         [SerializeField] private int maxTrackers = 10;
-        [SerializeField] private Vector2 interactiveRange = new Vector2(0.5f, 0.8f);
-        [SerializeField] private Vector2 heightRange;
+        [SerializeField] private Vector2 interactiveRangeY = new Vector2(0.3f, 0.8f);
+        [SerializeField] private Vector2 interactiveRangeZ = new Vector2(0.3f, 0.5f);
         [SerializeField] private Vector3 projectRange = new Vector3(10, 2, 1);
         [SerializeField] private bool renderObject;
         public bool RenderObject => renderObject;
@@ -33,10 +33,10 @@ namespace TLF
 
         public readonly int TRACK_OBJECT_NUM = 3;
 
-        public Vector3 GetPositionOnCurve(Vector2 uv)
+        public Vector3 GetPositionOnCurve(Vector3 uvw)
         {
-            var pos = bezier.data.Position(uv.x);
-            pos.y += Mathf.Lerp(heightRange.x, heightRange.y, interactiveRange.Interpolate(uv.y));
+            var pos = bezier.data.Position(uvw.x);
+            pos.y += Mathf.Lerp(-projectRange.y, projectRange.y, interactiveRangeY.Interpolate(uvw.y));
             return pos;
         }
 
@@ -63,17 +63,15 @@ namespace TLF
             var x = (float)e.message.data[4];
             var y = (float)e.message.data[5];
             var z = (float)e.message.data[6];
+            var pos = new Vector3(x, y, -z);
 
             var trackObject = trackers[playerId].trackObjects[jointId];
-
-            var pos = new Vector3(x, y, -z);
             var wpos = Quaternion.AngleAxis(angle, Vector3.up) * pos + projectPlane.position;
             var dir = Vector3.ProjectOnPlane(wpos, -projectPlane.forward);
             var projPos = new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
             var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.right * 0.5f;
 
             trackObject.UpdateData(uniqueId, type, wpos, projPos, nmlProjPos);
-
             trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
             trackObject.transform.localScale = InteractiveEffect.Instance.Range * Vector3.one;
         }
@@ -82,7 +80,8 @@ namespace TLF
         {
             var pos = bezier.data.Position(rate);
             Gizmos.DrawWireSphere(pos, 0.5f);
-            Gizmos.DrawLine(pos + Vector3.up * heightRange.x, pos + Vector3.up * heightRange.y);
+            Gizmos.DrawRay(pos, projectPlane.transform.forward);
+            Gizmos.DrawLine(pos + Vector3.down * projectRange.y, pos + Vector3.up * projectRange.y);
         }
     }
 }

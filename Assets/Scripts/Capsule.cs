@@ -17,7 +17,6 @@ namespace TLF
         private float speed;
 
         private Color emissiveColor;
-
         private Vector3 initLocalPos;
         private quaternion initLocalRot;
 
@@ -45,6 +44,7 @@ namespace TLF
         {
             transform.localPosition = initLocalPos;
             transform.localRotation = initLocalRot;
+            emissiveColor = Color.black;
         }
 
         private void Update()
