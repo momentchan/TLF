@@ -182,6 +182,7 @@ Material:
     - _BlendMode: 0
     - _CoatMask: 0
     - _ConservativeDepthOffsetEnable: 0
+    - _Contrast: 1
     - _CullMode: 2
     - _CullModeForward: 2
     - _Cutoff: 0.5
