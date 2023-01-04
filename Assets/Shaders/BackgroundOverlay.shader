@@ -1,7 +1,11 @@
 Shader "FullScreen/BackgroundOverlay"
 {
     Properties{
-        _Background("Background2", 2D)= "grey" {}
+        _OriginTex("OriginTex", 2D)= "grey" {}
+        _BlurTex("BlurTex", 2D)= "grey" {}
+        _DepthTex("DepthTex", 2D)= "grey" {}
+        _T("T",float) = 0
+
         _ScaleOffset("ScaleOffset", Vector) = (1,1,0,0)
     }
     HLSLINCLUDE
@@ -36,7 +40,10 @@ Shader "FullScreen/BackgroundOverlay"
     // you can check them out in the source code of the core SRP package.
 
     float4 _ScaleOffset;
-    sampler2D _Background;
+    sampler2D _OriginTex;
+    sampler2D _BlurTex;
+    sampler2D _DepthTex;
+    float _T;
 
     float4 FullScreenPass(Varyings varyings) : SV_Target
     {
@@ -51,9 +58,14 @@ Shader "FullScreen/BackgroundOverlay"
 
         float2 uv = posInput.positionNDC.xy;
         float2 uv2 = uv * _ScaleOffset.xy - _ScaleOffset.zw;
-        float4 background = tex2D(_Background, uv2);
-        background *= step(uv2.x,1) * step(uv2.y,1) * step(0,uv2.x) * step(0,uv2.y);
-        return float4(background.rgb, 1 - color.a);
+
+        float4 origin = tex2D(_OriginTex, uv2);
+        float4 blur = tex2D(_BlurTex, uv2);
+        float mask = tex2D(_DepthTex, uv2);
+        float4 final = lerp(origin, blur, 1 - mask);
+        //float mask = tex2D(_BackgroundDepth, uv2);
+
+        return float4(final.rgb, 1 - color.a);
     }
 
     ENDHLSL
