@@ -37,7 +37,7 @@ namespace TLF {
         private void SwitchCameraMode() {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                mode = (CameraMode)(((int)mode + 1) % 3);
+                mode = (CameraMode)(((int)mode + 1) % 2);
             }
 
             switch (mode)

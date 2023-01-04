@@ -1,7 +1,7 @@
 Shader "FullScreen/BackgroundOverlay"
 {
     Properties{
-        _Background("Background", 2DArray)= "grey" {}
+        _Background("Background2", 2D)= "grey" {}
         _ScaleOffset("ScaleOffset", Vector) = (1,1,0,0)
     }
     HLSLINCLUDE
@@ -35,8 +35,8 @@ Shader "FullScreen/BackgroundOverlay"
     // There are also a lot of utility function you can use inside Common.hlsl and Color.hlsl,
     // you can check them out in the source code of the core SRP package.
 
-    TEXTURE2D_X(_Background);
     float4 _ScaleOffset;
+    sampler2D _Background;
 
     float4 FullScreenPass(Varyings varyings) : SV_Target
     {
@@ -50,7 +50,9 @@ Shader "FullScreen/BackgroundOverlay"
         color = LOAD_TEXTURE2D_X_LOD(_ColorPyramidTexture, varyings.positionCS.xy, 0);
 
         float2 uv = posInput.positionNDC.xy;
-        float4 background = SAMPLE_TEXTURE2D_X_LOD(_Background, s_linear_clamp_sampler, uv * _ScaleOffset.xy - _ScaleOffset.zw, 0);
+        float2 uv2 = uv * _ScaleOffset.xy - _ScaleOffset.zw;
+        float4 background = tex2D(_Background, uv2);
+        background *= step(uv2.x,1) * step(uv2.y,1) * step(0,uv2.x) * step(0,uv2.y);
         return float4(background.rgb, 1 - color.a);
     }
 
