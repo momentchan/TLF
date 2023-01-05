@@ -22,6 +22,12 @@ namespace TLF
             c2.content = content;
             content = null;
         }
+
+        private void Start()
+        {
+            box.gameObject.SetActive(true);
+        }
+
         public void ZoomIn()
         {
             StartCoroutine(StartZoomIn());
