@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using com.rfilkov.kinect;
 using UnityEngine;
 
 namespace TLF
@@ -9,7 +6,6 @@ namespace TLF
     {
         public float debugSize = 0.2f;
 
-        [SerializeField] private KinectInterop.JointType jointType;
         [SerializeField] private int uniqueId;
 
         private Vector3 worldPos;
@@ -24,10 +20,9 @@ namespace TLF
         private Color worldColor = Color.red;
         private Color projectColor = Color.green;
 
-        public void UpdateData(int uniqueId, KinectInterop.JointType type, Vector3 wpos, Vector3 projPos, Vector3 nmlProjPos)
+        public void UpdateData(int uniqueId, Vector3 wpos, Vector3 projPos, Vector3 nmlProjPos)
         {
             this.uniqueId = uniqueId;
-            jointType = type;
 
             worldPos = wpos;
             projectedPos = projPos;

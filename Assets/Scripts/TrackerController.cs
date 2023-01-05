@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using BezierTools;
-using com.rfilkov.kinect;
 using mj.gist;
 using Osc;
 using UnityEngine;
@@ -56,8 +55,9 @@ namespace TLF
 
             var uniqueId = (int)e.message.data[0];
             var playerId = (int)e.message.data[1];
-            var type = (KinectInterop.JointType)e.message.data[2];
-            if (type == KinectInterop.JointType.Head) return;
+            var type = (int)e.message.data[2];
+            if (type == 4) return; // head
+
             var jointId = (int)e.message.data[3];
 
             var x = (float)e.message.data[4];
@@ -71,7 +71,7 @@ namespace TLF
             var projPos = new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
             var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.right * 0.5f;
 
-            trackObject.UpdateData(uniqueId, type, wpos, projPos, nmlProjPos);
+            trackObject.UpdateData(uniqueId, wpos, projPos, nmlProjPos);
             trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
             trackObject.transform.localScale = InteractiveEffect.Instance.Range * Vector3.one;
         }

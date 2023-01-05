@@ -9,12 +9,11 @@ namespace TLF {
     {
         [Header("Cameras")]
         [SerializeField] private CameraMode mode;
+        [SerializeField] private PlayMode playMode;
         [SerializeField] private Camera sceneCamera;
         [SerializeField] private Camera simulateCamera;
-         private CameraMode preMode;
 
         public PlayMode Mode => playMode;
-        [SerializeField] private PlayMode playMode;
 
         [Header("Timeline")]
         [SerializeField] private OutputController outputController;
@@ -50,11 +49,6 @@ namespace TLF {
                     sceneCamera.enabled = false;
                     simulateCamera.enabled = true;
                     break;
-            }
-
-            if (preMode != mode)
-            {
-                preMode = mode;
             }
         }
 
