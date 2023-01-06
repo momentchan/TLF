@@ -6,9 +6,9 @@ namespace TLF
     public class SceneController : MonoBehaviour
     {
         [SerializeField] private Transform sceneCam;
-        [SerializeField] private BoxContainer container1;
-        [SerializeField] private BoxContainer container2;
         [SerializeField] private ToyContainer toyContainer;
+        [SerializeField] private Box box1;
+        [SerializeField] private Box box2;
 
         [Header("Movement")]
         [SerializeField] private AnimationCurve moveCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -21,6 +21,9 @@ namespace TLF
         [SerializeField] private float zoomInDistRatio = 0.1f;
         [SerializeField] private float zoomInHideRatio = 0.7f;
 
+        [SerializeField] private Output outputL, outputR;
+
+
         public float ZoomInT => zoomInT;
         public float ZoomInHideRatio => zoomInHideRatio;
         public Vector3 GetZoomInPosition(Vector3 from, float t)
@@ -29,13 +32,13 @@ namespace TLF
 
         private void Start()
         {
-            container1.Setup(this);
-            container2.Setup(this);
+            box1.Setup(this);
+            box2.Setup(this);
         }
 
         public void ScaleUp()
         {
-            container1.ZoomIn();
+            box1.ZoomIn();
         }
 
         public void MoveBoxes()
@@ -48,25 +51,42 @@ namespace TLF
             yield return null;
 
             var t = 0f;
-            var initPos1 = container1.transform.localPosition;
-            var initPos2 = container2.transform.localPosition;
+            var initPos1 = box1.transform.localPosition;
+            var initPos2 = box2.transform.localPosition;
             while (t < moveT)
             {
                 t += Time.deltaTime;
                 var dist = -Mathf.Lerp(0, offset, moveCurve.Evaluate(t / moveT));
-                container1.transform.localPosition = initPos1 + Vector3.right * dist;
-                container2.transform.localPosition = initPos2 + Vector3.right * dist;
+                box1.transform.localPosition = initPos1 + Vector3.right * dist;
+                box2.transform.localPosition = initPos2 + Vector3.right * dist;
                 yield return null;
             }
-            container1.transform.localPosition = Vector3.right * offset;
-            container1.CopyConentTo(container2);
-            container1.Reset();
+            box1.transform.localPosition = Vector3.right * offset;
+            box1.CopyConentTo(box2);
+            box1.Reset();
 
-            var temp = container1;
-            container1 = container2;
-            container2 = temp;
+            var temp = box1;
+            box1 = box2;
+            box2 = temp;
 
             toyContainer.SwitchToy();
+        }
+    }
+
+
+    [System.Serializable]
+    public class Output
+    {
+        public Material mat;
+        public RenderTexture realtimeTex;
+        public Texture2D prerenderTex;
+        public void StartRealtime()
+        {
+            mat.SetTexture("_MainTex", realtimeTex);
+        }
+        public void StartPrerender()
+        {
+            mat.SetTexture("_MainTex", prerenderTex);
         }
     }
 }

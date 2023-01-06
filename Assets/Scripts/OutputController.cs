@@ -20,23 +20,6 @@ namespace TLF
             outputL.StartPrerender();
             outputR.StartPrerender();
         }
-
-
-        [System.Serializable]
-        public class Output
-        {
-            public Material mat;
-            public RenderTexture realtimeTex;
-            public Texture2D prerenderTex;
-            public void StartRealtime()
-            {
-                mat.SetTexture("_MainTex", realtimeTex);
-            }
-            public void StartPrerender()
-            {
-                mat.SetTexture("_MainTex", prerenderTex);
-            }
-        }
     }
     public enum OutputMode
     {

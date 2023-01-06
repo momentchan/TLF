@@ -1,32 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using mj.gist;
+using PrefsGUI;
+using PrefsGUI.RapidGUI;
 using UnityEngine;
 
 namespace TLF
 {
-    public class InteractiveEffect : SingletonMonoBehaviour<InteractiveEffect>
+    public class InteractiveEffect : SingletonMonoBehaviour<InteractiveEffect>, IGUIUser
     {
-        [SerializeField] private float forcePower = 100;
-        [SerializeField, Range(0, 1)] private float velocityBlend = 0.5f;
+        private PrefsFloat forcePower = new PrefsFloat("ForcePower", 100f);
+        private PrefsFloat velocityBlend = new PrefsFloat("VelocityBlend", 0.95f);
 
-        [Header("Speed")]
-        [SerializeField] private float maxSpeed = 2;
-        [SerializeField] private float speedPower = 1;
+        private PrefsFloat maxSpeed = new PrefsFloat("MaxSpeed", 2f);
+        private PrefsFloat speedPower = new PrefsFloat("SpeedPower", 200f);
 
-        [Header("Color")]
-        [SerializeField] public float colorBlendRate = 0.5f;
+        private PrefsFloat colorBlend = new PrefsFloat("ColorBlend", 0.5f);
+        private PrefsFloat interactiveRange = new PrefsFloat("InteractiveRange", 1.25f);
 
-        [SerializeField] private float range = 1.25f;
-        public float Range => range;
+        public float ColorBlend => colorBlend;
+        public float InteractiveRange => interactiveRange;
 
+        #region GUI
+        public string GetName() => "Interaction";
 
-        public Vector3 GetVelocityFactor(Vector3 velocity) 
-            => Mathf.Clamp01(Mathf.Pow(Mathf.Clamp01(velocity.magnitude / maxSpeed), speedPower)) * velocity.normalized;
-        
-        public Vector3 GetForce(Vector3 dir, Vector3 vel)
+        public void ShowGUI()
         {
-            return Vector3.Lerp(dir, vel, velocityBlend) * forcePower;
+            forcePower.DoGUI();
+            velocityBlend.DoGUISlider(0, 1f);
+            maxSpeed.DoGUI();
+            speedPower.DoGUI();
+            colorBlend.DoGUISlider(0, 1f);
+            interactiveRange.DoGUI();
         }
+        #endregion
+
+        public Vector3 GetVelocityFactor(Vector3 velocity)
+            => Mathf.Clamp01(Mathf.Pow(Mathf.Clamp01(velocity.magnitude / maxSpeed), speedPower)) * velocity.normalized;
+
+        public Vector3 GetForce(Vector3 dir, Vector3 vel) 
+            => Vector3.Lerp(dir, vel, velocityBlend) * forcePower;
     }
 }

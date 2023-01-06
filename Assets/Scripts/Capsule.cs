@@ -37,7 +37,7 @@ namespace TLF
             var dir = transform.position - pos;
             rigidbody.AddForce(InteractiveEffect.Instance.GetForce(dir, vel));
 
-            emissiveColor = Color.Lerp(color, emissiveColor, InteractiveEffect.Instance.colorBlendRate);
+            emissiveColor = Color.Lerp(color, emissiveColor, InteractiveEffect.Instance.ColorBlend);
         }
 
         public void Reset()

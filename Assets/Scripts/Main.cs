@@ -14,7 +14,6 @@ namespace TLF {
         [SerializeField] private Camera simulateCamera;
 
         public PlayMode Mode => playMode;
-
         [Header("Timeline")]
         [SerializeField] private OutputController outputController;
 
@@ -28,9 +27,12 @@ namespace TLF {
             playMode = PlayMode.Static;
         }
 
+
         void Update()
         {
             SwitchCameraMode();
+
+            if (!Application.isPlaying) return;
         }
 
         private void SwitchCameraMode() {

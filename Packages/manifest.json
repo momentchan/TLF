@@ -3,12 +3,19 @@
     {
       "name": "Keijiro",
       "url": "https://registry.npmjs.com",
-      "scopes": [ "jp.keijiro" ]
+      "scopes": [
+        "jp.keijiro"
+      ]
+    },
+    {
+      "name": "fuqunaga",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "ga.fuquna"
+      ]
     }
   ],
   "dependencies": {
-    "jp.keijiro.klak.spout": "2.0.3",
-    "com.unity.barracuda": "https://github.com/Unity-Technologies/barracuda-release.git#3.0.0",
     "com.unity.collab-proxy": "1.17.6",
     "com.unity.feature.development": "1.0.1",
     "com.unity.formats.alembic": "2.2.2",
@@ -21,6 +28,13 @@
     "com.unity.timeline": "1.6.4",
     "com.unity.ugui": "1.0.0",
     "com.unity.visualscripting": "1.7.8",
+    "ga.fuquna.prefsgui": "3.2.4",
+    "ga.fuquna.prefsgui.rapidgui": "0.0.2",
+    "ga.fuquna.prefsgui.rosettaui": "0.0.10",
+    "ga.fuquna.rapidgui": "1.2.3",
+    "ga.fuquna.rosettaui": "1.0.2",
+    "ga.fuquna.rosettaui.uitoolkit": "1.0.2",
+    "jp.keijiro.klak.spout": "2.0.3",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

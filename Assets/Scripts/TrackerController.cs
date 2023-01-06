@@ -2,11 +2,13 @@ using System.Collections.Generic;
 using BezierTools;
 using mj.gist;
 using Osc;
+using PrefsGUI;
+using PrefsGUI.RapidGUI;
 using UnityEngine;
 
 namespace TLF
 {
-    public class TrackerController : SingletonMonoBehaviour<TrackerController>
+    public class TrackerController : SingletonMonoBehaviour<TrackerController>, IGUIUser
     {
         public Transform ProjectPlane => projectPlane;
 
@@ -14,8 +16,10 @@ namespace TLF
         [SerializeField] private Transform projectPlane;
         [SerializeField] private Tracker trackerPrefab;
 
-        [SerializeField, Range(0, 1)] private float rate = 0;
-        [SerializeField] private int maxTrackers = 10;
+        [SerializeField, Range(0, 1)] private float bezierDebugRate = 0;
+
+        private PrefsInt maxTrackers = new PrefsInt("MaxTrackers", 20);
+
         [SerializeField] private Vector2 interactiveRangeY = new Vector2(0.3f, 0.8f);
         [SerializeField] private Vector2 interactiveRangeZ = new Vector2(0.3f, 0.5f);
         [SerializeField] private Vector3 projectRange = new Vector3(10, 2, 1);
@@ -28,9 +32,19 @@ namespace TLF
         public float MaxIdleTime => maxIdleTime;
 
 
-        [SerializeField] private List<Tracker> trackers = new List<Tracker>();
+        private List<Tracker> trackers = new List<Tracker>();
 
         public readonly int TRACK_OBJECT_NUM = 3;
+
+        #region GUI
+        public string GetName() => "Tracker";
+
+        public void ShowGUI()
+        {
+            maxTrackers.DoGUI();
+        }
+
+        #endregion
 
         public Vector3 GetPositionOnCurve(Vector3 uvw)
         {
@@ -48,7 +62,6 @@ namespace TLF
                 trackers.Add(tracker);
             }
         }
-
         public virtual void OscMessageReceived(OscPort.Capsule e)
         {
             if (Main.Instance.Mode == Main.PlayMode.Static) return;
@@ -66,19 +79,19 @@ namespace TLF
             var pos = new Vector3(x, y, -z);
 
             var trackObject = trackers[playerId].trackObjects[jointId];
-            var wpos = Quaternion.AngleAxis(angle, Vector3.up) * pos + projectPlane.position;
+            var wpos = projectPlane.position + Quaternion.AngleAxis(angle, Vector3.up) * pos;
             var dir = Vector3.ProjectOnPlane(wpos, -projectPlane.forward);
             var projPos = new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
             var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.right * 0.5f;
 
             trackObject.UpdateData(uniqueId, wpos, projPos, nmlProjPos);
             trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
-            trackObject.transform.localScale = InteractiveEffect.Instance.Range * Vector3.one;
+            trackObject.transform.localScale = InteractiveEffect.Instance.InteractiveRange * Vector3.one;
         }
 
         private void OnDrawGizmos()
         {
-            var pos = bezier.data.Position(rate);
+            var pos = bezier.data.Position(bezierDebugRate);
             Gizmos.DrawWireSphere(pos, 0.5f);
             Gizmos.DrawRay(pos, projectPlane.transform.forward);
             Gizmos.DrawLine(pos + Vector3.down * projectRange.y, pos + Vector3.up * projectRange.y);
