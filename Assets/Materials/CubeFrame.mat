@@ -277,6 +277,7 @@ Material:
     - _UVEmissive: 0
     - _UseEmissiveIntensity: 0
     - _UseGradientColorMap: 0
+    - _UseNormalMap: 1
     - _UseShadowThreshold: 0
     - _ZTestDepthEqualForOpaque: 3
     - _ZTestGBuffer: 4
