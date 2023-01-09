@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using Klak.Hap;
 using UnityEngine;
 
 namespace TLF
@@ -20,22 +22,17 @@ namespace TLF
         [SerializeField] private float zoomInT = 2f;
         [SerializeField] private float zoomInDistRatio = 0.1f;
         [SerializeField] private float zoomInHideRatio = 0.7f;
-
-        [SerializeField] private Output outputL, outputR;
-
-
         public float ZoomInT => zoomInT;
         public float ZoomInHideRatio => zoomInHideRatio;
         public Vector3 GetZoomInPosition(Vector3 from, float t)
             => Vector3.Lerp(from, sceneCam.position, zoomInCurve.Evaluate(t / zoomInT) * zoomInDistRatio);
-
 
         private void Start()
         {
             box1.Setup(this);
             box2.Setup(this);
         }
-
+       
         public void ScaleUp()
         {
             box1.ZoomIn();
@@ -70,23 +67,6 @@ namespace TLF
             box2 = temp;
 
             toyContainer.SwitchToy();
-        }
-    }
-
-
-    [System.Serializable]
-    public class Output
-    {
-        public Material mat;
-        public RenderTexture realtimeTex;
-        public Texture2D prerenderTex;
-        public void StartRealtime()
-        {
-            mat.SetTexture("_MainTex", realtimeTex);
-        }
-        public void StartPrerender()
-        {
-            mat.SetTexture("_MainTex", prerenderTex);
         }
     }
 }
