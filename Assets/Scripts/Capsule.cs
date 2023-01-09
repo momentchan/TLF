@@ -1,6 +1,7 @@
 using mj.gist;
 using Unity.Mathematics;
 using UnityEngine;
+using static TLF.CapsuleController;
 
 namespace TLF
 {
@@ -8,6 +9,7 @@ namespace TLF
     public class Capsule : MonoBehaviour
     {
         [SerializeField] private CapsuleController controller;
+        [SerializeField] private CapsuleKind kind;
         [SerializeField] private float seed;
 
         new Rigidbody rigidbody;
@@ -51,7 +53,7 @@ namespace TLF
         {
             if (!Application.isPlaying) return;
 
-            transform.localScale = controller.GetScale(seed);
+            transform.localScale = controller.GetScale(seed, kind);
 
             rigidbody.mass = controller.mass;
             rigidbody.drag = controller.drag;

@@ -18,9 +18,10 @@ namespace TLF
         [SerializeField] Bounds bounds;
 
         [Header("Appearance")]
-        [SerializeField] private Vector3 size = Vector3.one;
-        [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
+        [SerializeField] private Vector3 normalSize = Vector3.one;
+        [SerializeField] private Vector3 specialSize = Vector3.one;
         [SerializeField] private Vector2 speedRange = new Vector2(0, 0.1f);
+        [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
 
         [Header("Physics")]
         [SerializeField] public float mass = 1f;
@@ -32,13 +33,17 @@ namespace TLF
         [SerializeField, Range(0, 1)] public float speedSmooth = 0.5f;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
-        public Vector3 GetScale(float seed) => size * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
+        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
+        public Vector3 GetScale(float seed, CapsuleKind kind) => 
+            Size(kind) * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
+
         public float GetEmissionIntensiy(float speed) => math.remap(speedRange.x, speedRange.y, 0, 1, speed);
 
         protected override void Awake()
         {
             if (generate)
                 CreateCapsules();
+            capsules = GetComponentsInChildren<Capsule>().ToList();
         }
 
         public void Reset()
@@ -103,5 +108,7 @@ namespace TLF
         {
             Gizmos.DrawWireCube(bounds.center, bounds.size);
         }
+
+        public enum CapsuleKind { Normal, Special }
     }
 }
