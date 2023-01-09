@@ -27,11 +27,14 @@ namespace TLF
         public Vector3 GetZoomInPosition(Vector3 from, float t)
             => Vector3.Lerp(from, sceneCam.position, zoomInCurve.Evaluate(t / zoomInT) * zoomInDistRatio);
 
+        public Vector3 GetBoxInitialLocalPos(BoxType type) => type == BoxType.FrontBox ? Vector3.zero : Vector3.right * offset;
+
         private void Start()
         {
             box1.Setup(this);
             box2.Setup(this);
         }
+
        
         public void ScaleUp()
         {
@@ -41,6 +44,10 @@ namespace TLF
         public void MoveBoxes()
         {
             StartCoroutine(StartMove());
+        }
+        public void Update()
+        {
+            
         }
 
         IEnumerator StartMove()

@@ -7,6 +7,7 @@ namespace TLF
     public class Box : MonoBehaviour
     {
         [SerializeField] private MeshRenderer box;
+        [SerializeField] private BoxType type;
 
         private SceneController controller;
         public GameObject content;
@@ -55,4 +56,6 @@ namespace TLF
             box.gameObject.SetActive(true);
         }
     }
+
+    public enum BoxType { FrontBox, BackBox }
 }
