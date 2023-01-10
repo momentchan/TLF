@@ -7,7 +7,7 @@ namespace TLF
     {
         [SerializeField] private RenderTexture input;
         [SerializeField] private RenderTexture output_L, output_R;
-        [SerializeField] private ProjectHelper helper;
+        [SerializeField] private Projection helper;
         [SerializeField] private Shader shader;
 
         private Material _mat;

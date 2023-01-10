@@ -29,6 +29,14 @@ namespace TLF
             box.gameObject.SetActive(true);
         }
 
+        private void Update()
+        {
+            foreach(var m in box.sharedMaterials)
+            {
+                m.SetFloat("_TestPatternBlend", Projection.Instance.TestPatternBlend);
+            }
+        }
+
         public void ZoomIn()
         {
             StartCoroutine(StartZoomIn());
