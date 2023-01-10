@@ -6,13 +6,12 @@ namespace TLF
 {
     public class VideoController : MonoBehaviour
     {
-        [SerializeField] private VideoType type;
+        [SerializeField] private VideoType currentVideo;
+        [SerializeField] private bool countDown;
         [SerializeField] private List<VideoPlayer> players;
 
-        private void Start()
-        {
-            PlayVideo(type);
-        }
+        public void StartCountDown() => countDown = true;
+        private int countDownIndex = 0;
 
         void Update()
         {
@@ -22,10 +21,21 @@ namespace TLF
 
         public void ChangeVideo()
         {
-            type = (VideoType)(((int)type + 1) % Enum.GetValues(typeof(VideoType)).Length);
-            PlayVideo(type);
+            if (countDown)
+            {
+                PlayVideo((VideoType)countDownIndex);
+                countDownIndex = (countDownIndex + 1) % 3;
+            }
+            else
+            {
+                PlayVideo(VideoType.None);
+            }
         }
 
-        public void PlayVideo(VideoType type) => players.ForEach(p => p.Play(type));
+        public void PlayVideo(VideoType type)
+        {
+            currentVideo = type;
+            players.ForEach(p => p.Play(type));
+        }
     }
 }

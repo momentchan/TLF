@@ -29,5 +29,5 @@ namespace TLF
         }
 
     }
-    public enum VideoType { Ten, Twenty, Thirty, None }
+    public enum VideoType { Thirty, Twenty, Ten, None }
 }
