@@ -14,11 +14,13 @@ namespace TLF
         [SerializeField] private PlayMode playMode;
         [SerializeField] private Camera sceneCamera;
         [SerializeField] private Camera simulateCamera;
+        [SerializeField] private Camera devCamera;
 
         [Header("Timeline")]
         [SerializeField] private KeyCode timelineKey = KeyCode.P;
         [SerializeField] private PlayableAsset devTimeline;
         [SerializeField] private PlayableAsset prodTimeline;
+
 
         private PlayableDirector director;
 
@@ -49,6 +51,12 @@ namespace TLF
             director = GetComponent<PlayableDirector>();
         }
 
+        public void Reset()
+        {
+            
+        }
+
+
         void Update()
         {
             SwitchCameraMode();
@@ -68,26 +76,18 @@ namespace TLF
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                mode = (CameraMode)(((int)mode + 1) % 2);
+                mode = (CameraMode)(((int)mode + 1) % 3);
             }
 
-            switch (mode)
-            {
-                case CameraMode.Scene:
-                    sceneCamera.enabled = true;
-                    simulateCamera.enabled = false;
-                    break;
-                case CameraMode.Simulation:
-                    sceneCamera.enabled = false;
-                    simulateCamera.enabled = true;
-                    break;
-            }
+            sceneCamera.enabled = mode == CameraMode.Scene;
+            simulateCamera.enabled = mode == CameraMode.Simulation;
+            devCamera.enabled = mode == CameraMode.Dev;
         }
 
 
         public enum CameraMode
         {
-            Scene, Simulation
+            Scene, Simulation, Dev
         }
         public enum PlayMode
         {

@@ -4,31 +4,31 @@ namespace TLF
 {
     public class TrackerObject : MonoBehaviour
     {
-        public float debugSize = 0.2f;
-
         [SerializeField] private int uniqueId;
 
-        private Vector3 worldPos;
-        private Vector3 projectedPos;
-        private Vector3 normalizeProjectedPos;
-
-        private TrackerController controller;
+        private TrackerController controller => TrackerController.Instance;
         private float idleT = Mathf.Infinity;
         private MeshRenderer renderer;
 
-        private Color emissiveColor;
-        private Color worldColor = Color.red;
-        private Color projectColor = Color.green;
+        [SerializeField] private Transform world;
+        [SerializeField] private Transform projected;
+        [SerializeField] private Transform interaction;
 
-        public void UpdateData(int uniqueId, Vector3 wpos, Vector3 projPos, Vector3 nmlProjPos)
+        private Vector3 prevPos;
+        private Color emissiveColor;
+
+        public void UpdatePosition(int uniqueId, Vector3 wpos, Vector3 projPos, Vector3 nmlProjPos)
         {
             this.uniqueId = uniqueId;
-
-            worldPos = wpos;
-            projectedPos = projPos;
-            normalizeProjectedPos = nmlProjPos;
-
             idleT = 0;
+
+            world.transform.position = wpos;
+
+            var plane = controller.ProjectPlane;
+            projected.transform.position = plane.position + plane.right * projPos.x + plane.up * projPos.y;
+
+            interaction.transform.position = controller.GetPositionOnCurve(nmlProjPos);
+            interaction.transform.localScale = InteractiveEffect.Instance.InteractiveRange * Vector3.one;
 
             RandomUtil.RandomState(() =>
             {
@@ -36,13 +36,11 @@ namespace TLF
             }, uniqueId);
         }
 
-        private Vector3 prevPos;
 
         private void Start()
         {
-            controller = TrackerController.Instance;
-            renderer = GetComponent<MeshRenderer>();
-            prevPos = transform.position;
+            renderer = interaction.GetComponent<MeshRenderer>();
+            prevPos = interaction.transform.position;
         }
 
         private void Update()
@@ -52,19 +50,20 @@ namespace TLF
             var active = idleT < controller.MaxIdleTime;
             SetActive(active);
 
-            var velocity = (transform.position - prevPos) / Time.deltaTime;
-            prevPos = transform.position;
+            var velocity = (interaction.transform.position - prevPos) / Time.deltaTime;
+            prevPos = interaction.transform.position;
 
             if (active)
             {
-                var colliders = Physics.OverlapSphere(transform.position, InteractiveEffect.Instance.InteractiveRange);
+                var colliders = Physics.OverlapBox(interaction.transform.position, controller.extent, Quaternion.Euler(controller.rot));
+                //var colliders = Physics.OverlapSphere(transform.position, InteractiveEffect.Instance.InteractiveRange);
 
                 foreach (var collider in colliders)
                 {
                     var c = collider.GetComponent<Capsule>();
                     if (c != null)
                     {
-                        c.AddForce(transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity), emissiveColor);
+                        c.AddForce(interaction.transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity), emissiveColor);
                     }
                 }
             }
@@ -73,17 +72,6 @@ namespace TLF
         private void SetActive(bool active)
         {
             renderer.enabled = active && controller.RenderObject;
-        }
-
-
-        private void OnDrawGizmos()
-        {
-            var plane = controller.ProjectPlane;
-
-            Gizmos.color = worldColor;
-            Gizmos.DrawSphere(worldPos, debugSize);
-            Gizmos.color = projectColor;
-            Gizmos.DrawSphere(plane.position + plane.right * projectedPos.x + plane.up * projectedPos.y, debugSize);
         }
     }
 }
