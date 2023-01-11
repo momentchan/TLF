@@ -18,29 +18,31 @@ namespace TLF
         [SerializeField] private int length = 10;
         [SerializeField] private Bound bounds;
 
-        [Header("Appearance")]
-        [SerializeField] private Vector3 normalSize = Vector3.one;
-        [SerializeField] private Vector3 specialSize = Vector3.one;
-        [SerializeField] private Vector2 speedRange = new Vector2(0, 0.1f);
-        [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
-
-        private PrefsFloat drag = new PrefsFloat("Drag", 3f);
-        private PrefsFloat angularDrag = new PrefsFloat("AngularDrag", 0.2f);
-        private PrefsFloat staticFriction = new PrefsFloat("StaticFriction", 0.6f);
-        private PrefsFloat dynamicFriction = new PrefsFloat("DynamicFriction", 0.6f);
-        private PrefsFloat bounciness = new PrefsFloat("Bounciness", 0.6f);
-        private PrefsFloat speedSmooth = new PrefsFloat("SpeedSmooth", 0.6f);
-
         public Bound Bounds => bounds;
         public float Drag => drag;
         public float AngularDrag => angularDrag;
         public float SpeedSmooth => speedSmooth;
 
         #region gui
+        private PrefsVector3 normalSize = new PrefsVector3("NormalSize", new Vector3(0.4f, 0.2f, 0.4f));
+        private PrefsVector3 specialSize = new PrefsVector3("SpecialSize", new Vector3(1.5f, 1.5f, 1.5f));
+        private PrefsVector2 speedRange = new PrefsVector2("SpeedRange", new Vector2(0f, 2f));
+        private PrefsVector2 sizeRange = new PrefsVector2("SizeRange", new Vector2(0.8f, 1f));
+        private PrefsFloat drag = new PrefsFloat("Drag", 3f);
+        private PrefsFloat angularDrag = new PrefsFloat("AngularDrag", 0.2f);
+        private PrefsFloat staticFriction = new PrefsFloat("StaticFriction", 0.6f);
+        private PrefsFloat dynamicFriction = new PrefsFloat("DynamicFriction", 0.6f);
+        private PrefsFloat bounciness = new PrefsFloat("Bounciness", 0.6f);
+        private PrefsFloat speedSmooth = new PrefsFloat("SpeedSmooth", 0.6f);
         public string GetName() => "Capsules";
 
         public void ShowGUI()
         {
+            normalSize.DoGUI();
+            specialSize.DoGUI();
+            speedRange.DoGUI();
+            sizeRange.DoGUI();
+
             drag.DoGUI();
             angularDrag.DoGUI();
             staticFriction.DoGUI();
@@ -52,12 +54,12 @@ namespace TLF
 
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
-        
-        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
-        public Vector3 GetScale(float seed, CapsuleKind kind) => 
-            Size(kind) * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
 
-        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.x, speedRange.y, 0, 1, speed);
+        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
+        public Vector3 GetScale(float seed, CapsuleKind kind) =>
+            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed);
+
+        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.Get().x, speedRange.Get().y, 0, 1, speed);
 
         protected override void Awake()
         {
@@ -129,7 +131,7 @@ namespace TLF
             bounds.DrawGizmos();
         }
 
-       
+
 
         public enum CapsuleKind { Normal, Special }
     }
