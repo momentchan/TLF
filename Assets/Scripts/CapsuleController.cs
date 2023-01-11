@@ -17,11 +17,17 @@ namespace TLF
         [SerializeField] private bool generate;
         [SerializeField] private int length = 10;
         [SerializeField] private Bound bounds;
+        [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
         public Bound Bounds => bounds;
         public float Drag => drag;
         public float AngularDrag => angularDrag;
         public float SpeedSmooth => speedSmooth;
+        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
+        public Vector3 GetScale(float seed, CapsuleKind kind) =>
+            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed);
+
+        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.Get().x, speedRange.Get().y, 0, 1, speed);
 
         #region gui
         private PrefsVector3 normalSize = new PrefsVector3("NormalSize", new Vector3(0.4f, 0.2f, 0.4f));
@@ -52,15 +58,6 @@ namespace TLF
         }
         #endregion
 
-        [SerializeField] private List<Capsule> capsules = new List<Capsule>();
-
-
-        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
-        public Vector3 GetScale(float seed, CapsuleKind kind) =>
-            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed);
-
-        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.Get().x, speedRange.Get().y, 0, 1, speed);
-
         protected override void Awake()
         {
             if (generate)
@@ -81,6 +78,13 @@ namespace TLF
             physicMat.dynamicFriction = dynamicFriction;
         }
 
+        public void AddPulseForce(Vector3 force, Vector2 random, Color color)
+        {
+            foreach (var c in capsules)
+                c.AddForce(force, random, color, true);
+        }
+
+        #region generate
         private void CreateCapsules()
         {
             Clear();
@@ -125,13 +129,12 @@ namespace TLF
                 DestroyImmediate(c.gameObject);
             capsules.Clear();
         }
+        #endregion
 
         private void OnDrawGizmos()
         {
             bounds.DrawGizmos();
         }
-
-
 
         public enum CapsuleKind { Normal, Special }
     }

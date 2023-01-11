@@ -5,14 +5,15 @@ namespace TLF
     public class TrackerObject : MonoBehaviour
     {
         [SerializeField] private int uniqueId;
-
-        private TrackerController controller => TrackerController.Instance;
-        private float idleT = Mathf.Infinity;
-        private MeshRenderer renderer;
-
         [SerializeField] private Transform world;
         [SerializeField] private Transform projected;
         [SerializeField] private Transform interaction;
+
+        private TrackerController controller => TrackerController.Instance;
+        private InteractiveEffect effect => InteractiveEffect.Instance;
+
+        private float idleT = Mathf.Infinity;
+        private MeshRenderer renderer;
 
         private Vector3 prevPos;
         private Color emissiveColor;
@@ -53,7 +54,7 @@ namespace TLF
         {
             idleT += Time.deltaTime;
 
-            var active = idleT < controller.IdleTime;
+            var active = idleT < effect.IdleTime;
             renderer.enabled = active && controller.DebugMode;
 
             var velocity = (interaction.transform.position - prevPos) / Time.deltaTime;
@@ -61,14 +62,14 @@ namespace TLF
 
             if (active)
             {
-                var colliders = Physics.OverlapSphere(interaction.transform.position, InteractiveEffect.Instance.InteractiveRange);
+                var colliders = Physics.OverlapSphere(interaction.transform.position, effect.InteractiveRange);
 
                 foreach (var collider in colliders)
                 {
                     var c = collider.GetComponent<Capsule>();
                     if (c != null)
                     {
-                        c.AddForce(interaction.transform.position, InteractiveEffect.Instance.GetVelocityFactor(velocity), emissiveColor);
+                        c.AddForce(interaction.transform.position, effect.GetVelocityFactor(velocity), emissiveColor);
                     }
                 }
             }

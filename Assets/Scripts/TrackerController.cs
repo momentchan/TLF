@@ -21,7 +21,6 @@ namespace TLF
 
         public float SensorAngle => sensorAngle;
         public Vector3 WalkArea => walkArea;
-        public float IdleTime => idleTime;
 
         private List<Tracker> trackers = new List<Tracker>();
 
@@ -37,8 +36,6 @@ namespace TLF
         private PrefsVector4 curveRemapY = new PrefsVector4("CurveRemapY", new Vector4(0, 1f, -2f, 2f));
         private PrefsVector4 curveRemapZ = new PrefsVector4("CurveRemapZ", new Vector4(0, 1f, -0.5f, 0.5f));
 
-        private PrefsFloat idleTime = new PrefsFloat("IdleTIme", 2f);
-
         public string GetName() => "Tracker";
 
         public void ShowGUI()
@@ -47,7 +44,6 @@ namespace TLF
             trackerDebug.DoGUI();
             sensorAngle.DoGUI();
             walkArea.DoGUI();
-            idleTime.DoGUI();
 
             curveRemapY.DoGUI();
             curveRemapZ.DoGUI();
@@ -79,7 +75,7 @@ namespace TLF
         }
         public virtual void OscMessageReceived(OscPort.Capsule e)
         {
-            if (Main.Instance.Mode == Main.PlayMode.Static) return;
+            if (Main.Instance.Mode == Main.PlayMode.Static || !InteractiveEffect.Instance.Enable) return;
 
             var uniqueId = (int)e.message.data[0];
             var playerId = (int)e.message.data[1];

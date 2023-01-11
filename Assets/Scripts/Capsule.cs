@@ -37,9 +37,14 @@ namespace TLF
         public void AddForce(Vector3 pos, Vector3 vel, Color color)
         {
             var dir = transform.position - pos;
-            rigidbody.AddForce(InteractiveEffect.Instance.GetForce(dir, vel));
+            AddForce(InteractiveEffect.Instance.GetForce(dir, vel), Vector2.one, color);
+        }
 
-            emissiveColor = Color.Lerp(color, emissiveColor, InteractiveEffect.Instance.ColorBlend);
+        public void AddForce(Vector3 force, Vector2 random, Color color, bool colorOverride = false)
+        {
+            force *= Mathf.Lerp(random.x, random.y, seed);
+            rigidbody.AddForce(force);
+            emissiveColor = colorOverride ? color : Color.Lerp(color, emissiveColor, InteractiveEffect.Instance.ColorBlend);
         }
 
         public void Reset()
