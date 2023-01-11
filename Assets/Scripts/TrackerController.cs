@@ -4,52 +4,67 @@ using mj.gist;
 using Osc;
 using PrefsGUI;
 using PrefsGUI.RapidGUI;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace TLF
 {
     public class TrackerController : SingletonMonoBehaviour<TrackerController>, IGUIUser
     {
-        public Transform ProjectPlane => projectPlane;
+        public Transform WalkAreaTrans => area.transform;
 
         [SerializeField] private Bezier bezier;
-        [SerializeField] private Transform projectPlane;
+        [SerializeField] private WalkArea area;
         [SerializeField] private Tracker trackerPrefab;
 
         [SerializeField, Range(0, 1)] private float bezierDebugRate = 0;
 
-        private PrefsInt maxTrackers = new PrefsInt("MaxTrackers", 20);
-
-        [SerializeField] private Vector2 interactiveRangeY = new Vector2(0.3f, 0.8f);
-        [SerializeField] private Vector2 interactiveRangeZ = new Vector2(0.3f, 0.5f);
-        [SerializeField] private Vector3 projectRange = new Vector3(10, 2, 1);
-        [SerializeField] private bool renderObject;
-        public bool RenderObject => renderObject;
-        public Vector3 ProjectRange => projectRange;
-
-        [SerializeField] private float angle = 25f;
-        [SerializeField] private float maxIdleTime = 2f;
-        public float MaxIdleTime => maxIdleTime;
-
+        public float SensorAngle => sensorAngle;
+        public Vector3 WalkArea => walkArea;
+        public float IdleTime => idleTime;
 
         private List<Tracker> trackers = new List<Tracker>();
 
         public readonly int TRACK_OBJECT_NUM = 3;
 
         #region GUI
+        public bool DebugMode => trackerDebug;
+        private PrefsInt maxTrackers = new PrefsInt("MaxTrackers", 20);
+        private PrefsBool trackerDebug = new PrefsBool("TrackerDebug", false);
+        private PrefsFloat sensorAngle = new PrefsFloat("SensorAngle", 45);
+        private PrefsVector3 walkArea = new PrefsVector3("WalkArea", new Vector3(5f, 1.5f, 5));
+
+        private PrefsVector4 curveRemapY = new PrefsVector4("CurveRemapY", new Vector4(0, 1f, -2f, 2f));
+        private PrefsVector4 curveRemapZ = new PrefsVector4("CurveRemapZ", new Vector4(0, 1f, -0.5f, 0.5f));
+
+        private PrefsFloat idleTime = new PrefsFloat("IdleTIme", 2f);
+
         public string GetName() => "Tracker";
 
         public void ShowGUI()
         {
             maxTrackers.DoGUI();
-        }
+            trackerDebug.DoGUI();
+            sensorAngle.DoGUI();
+            walkArea.DoGUI();
+            idleTime.DoGUI();
 
+            curveRemapY.DoGUI();
+            curveRemapZ.DoGUI();
+        }
         #endregion
 
         public Vector3 GetPositionOnCurve(Vector3 uvw)
         {
             var pos = bezier.data.Position(uvw.x);
-            pos.y += Mathf.Lerp(-projectRange.y, projectRange.y, interactiveRangeY.Interpolate(uvw.y));
+
+            // y
+            pos.y += Mathf.Lerp(curveRemapY.Get().z, curveRemapY.Get().w, math.unlerp(curveRemapY.Get().x, curveRemapY.Get().y, uvw.y));
+
+            // z
+            var depth = Mathf.Lerp(curveRemapZ.Get().z, curveRemapZ.Get().w, math.unlerp(curveRemapZ.Get().x, curveRemapZ.Get().y, uvw.z));
+            pos += WalkAreaTrans.forward * depth;
+
             return pos;
         }
 
@@ -79,22 +94,13 @@ namespace TLF
             var pos = new Vector3(x, y, -z);
 
             var trackObject = trackers[playerId].trackObjects[jointId];
-            var wpos = projectPlane.position + Quaternion.AngleAxis(angle, Vector3.up) * pos;
-            var dir = Vector3.ProjectOnPlane(wpos, -projectPlane.forward);
-            var projPos = new Vector3(Vector3.Dot(dir, projectPlane.right), Vector3.Dot(dir, projectPlane.up), 0);
-            var nmlProjPos = Vector3.Scale(projPos, new Vector3(1 / ProjectRange.x, 1 / ProjectRange.y, 0)) + Vector3.right * 0.5f;
-
-            trackObject.UpdateData(uniqueId, wpos, projPos, nmlProjPos);
-            trackObject.transform.position = GetPositionOnCurve(nmlProjPos);
-            trackObject.transform.localScale = InteractiveEffect.Instance.InteractiveRange * Vector3.one;
+            trackObject.UpdatePosition(uniqueId, pos);
         }
 
         private void OnDrawGizmos()
         {
             var pos = bezier.data.Position(bezierDebugRate);
             Gizmos.DrawWireSphere(pos, 0.5f);
-            Gizmos.DrawRay(pos, projectPlane.transform.forward);
-            Gizmos.DrawLine(pos + Vector3.down * projectRange.y, pos + Vector3.up * projectRange.y);
         }
     }
 }

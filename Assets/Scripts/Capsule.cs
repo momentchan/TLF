@@ -53,13 +53,15 @@ namespace TLF
         {
             if (!Application.isPlaying) return;
 
+            if (!controller.Bounds.Contains(transform.position))
+                Reset();
+
             transform.localScale = controller.GetScale(seed, kind);
 
-            rigidbody.mass = controller.mass;
-            rigidbody.drag = controller.drag;
-            rigidbody.angularDrag = controller.angularDrag;
+            rigidbody.drag = controller.Drag;
+            rigidbody.angularDrag = controller.AngularDrag;
 
-            speed = Mathf.Lerp(rigidbody.velocity.magnitude, speed, controller.speedSmooth);
+            speed = Mathf.Lerp(rigidbody.velocity.magnitude, speed, controller.SpeedSmooth);
 
             block.SetFloat("_EmissiveIntensity", controller.GetEmissionIntensiy(speed));
             block.SetColor("_EmissiveColor", emissiveColor);

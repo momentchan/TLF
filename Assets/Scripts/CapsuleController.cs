@@ -2,42 +2,64 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using mj.gist;
+using PrefsGUI;
+using PrefsGUI.RapidGUI;
 using Unity.Mathematics;
 using UnityEngine;
 
 namespace TLF
 {
-    public class CapsuleController : SingletonMonoBehaviour<CapsuleController>
+    public class CapsuleController : SingletonMonoBehaviour<CapsuleController>, IGUIUser
     {
         [SerializeField] FoamTransformDataset foams;
         [SerializeField] private Capsule prefab;
         [SerializeField] private PhysicMaterial physicMat;
         [SerializeField] private bool generate;
         [SerializeField] private int length = 10;
+        [SerializeField] private Bound bounds;
 
-        [SerializeField] Bounds bounds;
+        public Bound Bounds => bounds;
+        public float Drag => drag;
+        public float AngularDrag => angularDrag;
+        public float SpeedSmooth => speedSmooth;
 
-        [Header("Appearance")]
-        [SerializeField] private Vector3 normalSize = Vector3.one;
-        [SerializeField] private Vector3 specialSize = Vector3.one;
-        [SerializeField] private Vector2 speedRange = new Vector2(0, 0.1f);
-        [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
+        #region gui
+        private PrefsVector3 normalSize = new PrefsVector3("NormalSize", new Vector3(0.4f, 0.2f, 0.4f));
+        private PrefsVector3 specialSize = new PrefsVector3("SpecialSize", new Vector3(1.5f, 1.5f, 1.5f));
+        private PrefsVector2 speedRange = new PrefsVector2("SpeedRange", new Vector2(0f, 2f));
+        private PrefsVector2 sizeRange = new PrefsVector2("SizeRange", new Vector2(0.8f, 1f));
+        private PrefsFloat drag = new PrefsFloat("Drag", 3f);
+        private PrefsFloat angularDrag = new PrefsFloat("AngularDrag", 0.2f);
+        private PrefsFloat staticFriction = new PrefsFloat("StaticFriction", 0.6f);
+        private PrefsFloat dynamicFriction = new PrefsFloat("DynamicFriction", 0.6f);
+        private PrefsFloat bounciness = new PrefsFloat("Bounciness", 0.6f);
+        private PrefsFloat speedSmooth = new PrefsFloat("SpeedSmooth", 0.6f);
+        public string GetName() => "Capsules";
 
-        [Header("Physics")]
-        [SerializeField] public float mass = 1f;
-        [SerializeField] public float drag = 2f;
-        [SerializeField] public float angularDrag = 0.05f;
-        [SerializeField] private float staticFriction = 0.6f;
-        [SerializeField] private float dynamicFriction = 0.6f;
-        [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
-        [SerializeField, Range(0, 1)] public float speedSmooth = 0.5f;
+        public void ShowGUI()
+        {
+            normalSize.DoGUI();
+            specialSize.DoGUI();
+            speedRange.DoGUI();
+            sizeRange.DoGUI();
+
+            drag.DoGUI();
+            angularDrag.DoGUI();
+            staticFriction.DoGUI();
+            dynamicFriction.DoGUI();
+            bounciness.DoGUISlider(0, 1);
+            speedSmooth.DoGUISlider(0, 1);
+        }
+        #endregion
+
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
-        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
-        public Vector3 GetScale(float seed, CapsuleKind kind) => 
-            Size(kind) * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
 
-        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.x, speedRange.y, 0, 1, speed);
+        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
+        public Vector3 GetScale(float seed, CapsuleKind kind) =>
+            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed);
+
+        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.Get().x, speedRange.Get().y, 0, 1, speed);
 
         protected override void Awake()
         {
@@ -66,10 +88,10 @@ namespace TLF
                 for (var j = 0; j < length; j++)
                     for (var k = 0; k < length; k++)
                     {
-                        var pos = bounds.center + new Vector3(
-                            Mathf.Lerp(-0.5f, 0.5f, 1f * i / length) * bounds.size.x,
-                            Mathf.Lerp(-0.5f, 0.5f, 1f * j / length) * bounds.size.y,
-                            Mathf.Lerp(-0.5f, 0.5f, 1f * k / length) * bounds.size.z);
+                        var pos = bounds.Center + new Vector3(
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * i / length) * bounds.Size.x,
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * j / length) * bounds.Size.y,
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * k / length) * bounds.Size.z);
 
                         CreateCapsule(pos, UnityEngine.Random.rotation);
                     }
@@ -106,8 +128,10 @@ namespace TLF
 
         private void OnDrawGizmos()
         {
-            Gizmos.DrawWireCube(bounds.center, bounds.size);
+            bounds.DrawGizmos();
         }
+
+
 
         public enum CapsuleKind { Normal, Special }
     }
