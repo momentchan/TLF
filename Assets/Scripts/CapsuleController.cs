@@ -2,20 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using mj.gist;
+using PrefsGUI;
+using PrefsGUI.RapidGUI;
 using Unity.Mathematics;
 using UnityEngine;
 
 namespace TLF
 {
-    public class CapsuleController : SingletonMonoBehaviour<CapsuleController>
+    public class CapsuleController : SingletonMonoBehaviour<CapsuleController>, IGUIUser
     {
         [SerializeField] FoamTransformDataset foams;
         [SerializeField] private Capsule prefab;
         [SerializeField] private PhysicMaterial physicMat;
         [SerializeField] private bool generate;
         [SerializeField] private int length = 10;
-
-        [SerializeField] Bounds bounds;
+        [SerializeField] private Bound bounds;
 
         [Header("Appearance")]
         [SerializeField] private Vector3 normalSize = Vector3.one;
@@ -23,16 +24,35 @@ namespace TLF
         [SerializeField] private Vector2 speedRange = new Vector2(0, 0.1f);
         [SerializeField] private Vector2 sizeRange = new Vector2(0.8f, 1f);
 
-        [Header("Physics")]
-        [SerializeField] public float mass = 1f;
-        [SerializeField] public float drag = 2f;
-        [SerializeField] public float angularDrag = 0.05f;
-        [SerializeField] private float staticFriction = 0.6f;
-        [SerializeField] private float dynamicFriction = 0.6f;
-        [SerializeField, Range(0, 1)] private float bounciness = 0.6f;
-        [SerializeField, Range(0, 1)] public float speedSmooth = 0.5f;
+        private PrefsFloat drag = new PrefsFloat("Drag", 3f);
+        private PrefsFloat angularDrag = new PrefsFloat("AngularDrag", 0.2f);
+        private PrefsFloat staticFriction = new PrefsFloat("StaticFriction", 0.6f);
+        private PrefsFloat dynamicFriction = new PrefsFloat("DynamicFriction", 0.6f);
+        private PrefsFloat bounciness = new PrefsFloat("Bounciness", 0.6f);
+        private PrefsFloat speedSmooth = new PrefsFloat("SpeedSmooth", 0.6f);
+
+        public Bound Bounds => bounds;
+        public float Drag => drag;
+        public float AngularDrag => angularDrag;
+        public float SpeedSmooth => speedSmooth;
+
+        #region gui
+        public string GetName() => "Capsules";
+
+        public void ShowGUI()
+        {
+            drag.DoGUI();
+            angularDrag.DoGUI();
+            staticFriction.DoGUI();
+            dynamicFriction.DoGUI();
+            bounciness.DoGUISlider(0, 1);
+            speedSmooth.DoGUISlider(0, 1);
+        }
+        #endregion
+
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
 
+        
         public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
         public Vector3 GetScale(float seed, CapsuleKind kind) => 
             Size(kind) * Mathf.Lerp(sizeRange.x, sizeRange.y, seed);
@@ -66,10 +86,10 @@ namespace TLF
                 for (var j = 0; j < length; j++)
                     for (var k = 0; k < length; k++)
                     {
-                        var pos = bounds.center + new Vector3(
-                            Mathf.Lerp(-0.5f, 0.5f, 1f * i / length) * bounds.size.x,
-                            Mathf.Lerp(-0.5f, 0.5f, 1f * j / length) * bounds.size.y,
-                            Mathf.Lerp(-0.5f, 0.5f, 1f * k / length) * bounds.size.z);
+                        var pos = bounds.Center + new Vector3(
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * i / length) * bounds.Size.x,
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * j / length) * bounds.Size.y,
+                            Mathf.Lerp(-0.5f, 0.5f, 1f * k / length) * bounds.Size.z);
 
                         CreateCapsule(pos, UnityEngine.Random.rotation);
                     }
@@ -106,8 +126,10 @@ namespace TLF
 
         private void OnDrawGizmos()
         {
-            Gizmos.DrawWireCube(bounds.center, bounds.size);
+            bounds.DrawGizmos();
         }
+
+       
 
         public enum CapsuleKind { Normal, Special }
     }

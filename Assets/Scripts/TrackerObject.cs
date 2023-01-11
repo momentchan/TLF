@@ -17,14 +17,20 @@ namespace TLF
         private Vector3 prevPos;
         private Color emissiveColor;
 
-        public void UpdatePosition(int uniqueId, Vector3 wpos, Vector3 projPos, Vector3 nmlProjPos)
+        public void UpdatePosition(int uniqueId, Vector3 sensorPos)
         {
             this.uniqueId = uniqueId;
             idleT = 0;
+            
+            var plane = controller.WalkAreaTrans;
+
+            var wpos = plane.position + Quaternion.AngleAxis(plane.localEulerAngles.y, Vector3.up) * sensorPos;
+
+            var dir = Vector3.ProjectOnPlane(wpos, -plane.forward);
+            var projPos = new Vector3(Vector3.Dot(dir, plane.right), Vector3.Dot(dir, plane.up), Mathf.Abs(sensorPos.z));
+            var nmlProjPos = Vector3.Scale(projPos, controller.WalkArea.Invert()) + Vector3.right * 0.5f;
 
             world.transform.position = wpos;
-
-            var plane = controller.ProjectPlane;
             projected.transform.position = plane.position + plane.right * projPos.x + plane.up * projPos.y;
 
             interaction.transform.position = controller.GetPositionOnCurve(nmlProjPos);
@@ -47,16 +53,15 @@ namespace TLF
         {
             idleT += Time.deltaTime;
 
-            var active = idleT < controller.MaxIdleTime;
-            SetActive(active);
+            var active = idleT < controller.IdleTime;
+            renderer.enabled = active && controller.DebugMode;
 
             var velocity = (interaction.transform.position - prevPos) / Time.deltaTime;
             prevPos = interaction.transform.position;
 
             if (active)
             {
-                var colliders = Physics.OverlapBox(interaction.transform.position, controller.extent, Quaternion.Euler(controller.rot));
-                //var colliders = Physics.OverlapSphere(transform.position, InteractiveEffect.Instance.InteractiveRange);
+                var colliders = Physics.OverlapSphere(interaction.transform.position, InteractiveEffect.Instance.InteractiveRange);
 
                 foreach (var collider in colliders)
                 {
@@ -67,11 +72,6 @@ namespace TLF
                     }
                 }
             }
-        }
-
-        private void SetActive(bool active)
-        {
-            renderer.enabled = active && controller.RenderObject;
         }
     }
 }
