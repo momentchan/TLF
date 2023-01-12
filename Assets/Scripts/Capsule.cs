@@ -22,7 +22,7 @@ namespace TLF
         private Block block;
         private float speed;
         private float life = 0;
-        public float nrmT => life / InteractiveEffect.Instance.LIfeTime;
+        public float nrmT => life / InteractiveEffect.Instance.LifeTime;
 
         private Color emissiveColor;
         private Vector3 initLocalPos;
@@ -51,7 +51,7 @@ namespace TLF
 
         public void AddExplode(Vector3 pos)
         {
-            rigidbody.AddExplosionForce(effect.explosionForce, pos, effect.explosionRadius);
+            rigidbody.AddExplosionForce(effect.ExplosionForce, pos, effect.ExplosionRadius);
         }
 
         public void AddForce(Vector3 force, Vector2 random, Color color, bool colorOverride = false)
