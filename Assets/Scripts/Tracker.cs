@@ -8,9 +8,10 @@ namespace TLF
     {
         [SerializeField] private TrackerObject objectPrefab;
         public int playerIndex;
-
         public List<TrackerObject> trackObjects = new List<TrackerObject>();
 
+        public bool IsActive => idleT < InteractiveEffect.Instance.IdleTime;
+        private float idleT = 0;
         public void Setup(int userId)
         {
             this.playerIndex = userId;
@@ -23,6 +24,16 @@ namespace TLF
                 var o = Instantiate(objectPrefab, transform);
                 trackObjects.Add(o);
             }
+        }
+
+        private void Update()
+        {
+            idleT += Time.deltaTime;
+        }
+
+        public void Activate()
+        {
+            idleT = 0;
         }
     }
 }

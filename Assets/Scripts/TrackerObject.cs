@@ -22,7 +22,7 @@ namespace TLF
         {
             this.uniqueId = uniqueId;
             idleT = 0;
-            
+
             var plane = controller.WalkAreaTrans;
 
             var wpos = plane.position + Quaternion.AngleAxis(plane.localEulerAngles.y, Vector3.up) * sensorPos;
@@ -43,13 +43,11 @@ namespace TLF
             }, uniqueId);
         }
 
-
         private void Start()
         {
             renderer = interaction.GetComponent<MeshRenderer>();
             prevPos = interaction.transform.position;
         }
-
         private void Update()
         {
             idleT += Time.deltaTime;
@@ -58,9 +56,12 @@ namespace TLF
             renderer.enabled = active && controller.DebugMode;
 
             var velocity = (interaction.transform.position - prevPos) / Time.deltaTime;
+            var speed = velocity.magnitude;
+            var f = speed > effect.SpeedThreshold;
+            renderer.material.SetColor("_UnlitColor", f ? Color.red : Color.blue);
             prevPos = interaction.transform.position;
 
-            if (active)
+            if (active && f)
             {
                 var colliders = Physics.OverlapSphere(interaction.transform.position, effect.InteractiveRange);
 

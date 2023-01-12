@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using BezierTools;
 using mj.gist;
 using Osc;
@@ -25,6 +27,8 @@ namespace TLF
         private List<Tracker> trackers = new List<Tracker>();
 
         public readonly int TRACK_OBJECT_NUM = 3;
+
+        public int ActiveTrackerNum => trackers.Where(t => t.IsActive == true).Count();
 
         #region GUI
         public bool DebugMode => trackerDebug;
@@ -66,6 +70,7 @@ namespace TLF
 
         private void Start()
         {
+
             for (var i = 0; i < maxTrackers; i++)
             {
                 var tracker = Instantiate(trackerPrefab, transform);
@@ -73,6 +78,7 @@ namespace TLF
                 trackers.Add(tracker);
             }
         }
+
 
         public virtual void OscMessageReceived(OscPort.Capsule e)
         {
@@ -91,6 +97,8 @@ namespace TLF
             var pos = new Vector3(x, y, -z);
 
             var tracker = trackers[playerId];
+            tracker.Activate();
+
             var trackObject = tracker.trackObjects[jointId];
             trackObject.UpdatePosition(uniqueId, pos);
         }
@@ -100,5 +108,7 @@ namespace TLF
             var pos = bezier.data.Position(bezierDebugRate);
             Gizmos.DrawWireSphere(pos, 0.5f);
         }
+
+        
     }
 }
