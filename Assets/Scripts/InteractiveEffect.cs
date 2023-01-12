@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using mj.gist;
 using PrefsGUI;
 using PrefsGUI.RapidGUI;
@@ -9,61 +8,74 @@ namespace TLF
 {
     public class InteractiveEffect : SingletonMonoBehaviour<InteractiveEffect>, IGUIUser
     {
-        private bool enable = true;
         public bool Enable => enable;
-
-        public float ColorBlend => colorBlend;
-        public float InteractiveRange => interactiveRange;
-        public float IdleTime => idleTime;
+        private bool enable = true;
+        public float GetTouchScaleMultiplier(float nrmT) => Mathf.Lerp(1, TouchedScaleMultiplier, nrmT);
+        public Vector3 GetVelocityFactor(Vector3 velocity)
+            => Mathf.Clamp01(Mathf.Pow(Mathf.Clamp01(velocity.magnitude / MaxSpeed), SpeedPower)) * velocity.normalized;
+        public Vector3 GetForce(Vector3 dir, Vector3 vel)
+            => Vector3.Lerp(dir, vel, VelocityBlend) * ForcePower;
 
         #region gui
-        private PrefsFloat forcePower = new PrefsFloat("ForcePower", 100f);
-        private PrefsFloat pulsePower = new PrefsFloat("PulsePower", 300f);
-        private PrefsVector2 pulseRandom = new PrefsVector2("PulseRandom", new Vector2(0.6f, 1f));
-        private PrefsFloat pulseWarmUpT = new PrefsFloat("PulseWarmUpT", 2f);
-        private PrefsFloat pulseCoolDownT = new PrefsFloat("PulseCoolDownT", 3f);
+        public PrefsFloat ForcePower = new PrefsFloat("ForcePower", 100f);
+        public PrefsFloat PulsePower = new PrefsFloat("PulsePower", 300f);
+        public PrefsVector2 PulseRandom = new PrefsVector2("PulseRandom", new Vector2(0.6f, 1f));
+        public PrefsFloat PulseWarmUpT = new PrefsFloat("PulseWarmUpT", 2f);
+        public PrefsFloat PulseCoolDownT = new PrefsFloat("PulseCoolDownT", 3f);
 
-        private PrefsFloat velocityBlend = new PrefsFloat("VelocityBlend", 0.95f);
+        public PrefsFloat VelocityBlend = new PrefsFloat("VelocityBlend", 0.95f);
 
-        private PrefsFloat maxSpeed = new PrefsFloat("MaxSpeed", 2f);
-        private PrefsFloat speedPower = new PrefsFloat("SpeedPower", 200f);
+        public PrefsFloat MaxSpeed = new PrefsFloat("MaxSpeed", 2f);
+        public PrefsFloat SpeedPower = new PrefsFloat("SpeedPower", 200f);
 
-        private PrefsFloat colorBlend = new PrefsFloat("ColorBlend", 0.5f);
-        private PrefsFloat interactiveRange = new PrefsFloat("InteractiveRange", 1.25f);
-        private PrefsFloat idleTime = new PrefsFloat("IdleTIme", 2f);
+        public PrefsFloat ColorBlend = new PrefsFloat("ColorBlend", 0.5f);
+        public PrefsFloat InteractiveRange = new PrefsFloat("InteractiveRange", 1.25f);
+        public PrefsFloat IdleTime = new PrefsFloat("IdleTIme", 2f);
+
+        public PrefsFloat LifeTime = new PrefsFloat("Lifetime", 2f);
+        public PrefsFloat TouchedThreshold = new PrefsFloat("touchedThreshold", 1f);
+        public PrefsFloat TouchedScaleMultiplier = new PrefsFloat("TouchedScaleMultiplier", 3);
+
+        public PrefsFloat ExplosionForce = new PrefsFloat("ExplosionForce", 200f);
+        public PrefsFloat ExplosionRadius = new PrefsFloat("ExplosionRadius", 2f);
 
         public string GetName() => "Interaction";
         public float duration = 2f;
         public void ShowGUI()
         {
-            forcePower.DoGUI();
+            ForcePower.DoGUI();
 
-            pulsePower.DoGUI();
-            pulseRandom.DoGUI();
-            pulseWarmUpT.DoGUI();
-            pulseCoolDownT.DoGUI();
+            PulsePower.DoGUI();
+            PulseRandom.DoGUI();
+            PulseWarmUpT.DoGUI();
+            PulseCoolDownT.DoGUI();
 
-            velocityBlend.DoGUISlider(0, 1f);
-            maxSpeed.DoGUI();
-            speedPower.DoGUI();
-            colorBlend.DoGUISlider(0, 1f);
-            interactiveRange.DoGUI();
-            idleTime.DoGUI();
+            VelocityBlend.DoGUISlider(0, 1f);
+            MaxSpeed.DoGUI();
+            SpeedPower.DoGUI();
+            ColorBlend.DoGUISlider(0, 1f);
+            InteractiveRange.DoGUI();
+            IdleTime.DoGUI();
+
+            LifeTime.DoGUI();
+            TouchedThreshold.DoGUI();
+            TouchedScaleMultiplier.DoGUI();
+
+            ExplosionForce.DoGUI();
+            ExplosionRadius.DoGUI();
         }
         #endregion
 
-        public Vector3 GetVelocityFactor(Vector3 velocity)
-            => Mathf.Clamp01(Mathf.Pow(Mathf.Clamp01(velocity.magnitude / maxSpeed), speedPower)) * velocity.normalized;
-
-        public Vector3 GetForce(Vector3 dir, Vector3 vel)
-            => Vector3.Lerp(dir, vel, velocityBlend) * forcePower;
-
-        void Update()
+        private void Update()
         {
             if (Input.GetKeyDown(KeyCode.U))
-            {
-                StartCoroutine(PulseEffect());
-            }
+                StartPulseEffect();
+        }
+
+        public void StartPulseEffect()
+        {
+            StopAllCoroutines();
+            StartCoroutine(PulseEffect());
         }
 
         private IEnumerator PulseEffect()
@@ -71,10 +83,11 @@ namespace TLF
             yield return null;
             enable = false;
 
-            yield return new WaitForSeconds(pulseWarmUpT);
-            CapsuleController.Instance.AddPulseForce(pulsePower * Vector3.up, pulseRandom, Random.ColorHSV(0, 1, 0.5f, 1f, 1f, 1f));
+            yield return new WaitForSeconds(PulseWarmUpT);
 
-            yield return new WaitForSeconds(pulseCoolDownT);
+            CapsuleController.Instance.AddPulseForce(PulsePower * Vector3.up, PulseRandom, Random.ColorHSV(0, 1, 0.5f, 1f, 1f, 1f));
+
+            yield return new WaitForSeconds(PulseCoolDownT);
             enable = true;
         }
     }

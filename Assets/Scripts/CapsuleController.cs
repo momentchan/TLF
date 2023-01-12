@@ -6,6 +6,7 @@ using PrefsGUI;
 using PrefsGUI.RapidGUI;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace TLF
 {
@@ -18,16 +19,21 @@ namespace TLF
         [SerializeField] private int length = 10;
         [SerializeField] private Bound bounds;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
-
+        [SerializeField] private AnimationCurve explodeScaleCurve;
+        public float ExplodeDuration = 0.5f;
+        public float ExplodeStrength = 2f;
+        public AnimationCurve ExplodeScaleCurve => explodeScaleCurve;
         public Bound Bounds => bounds;
         public float Drag => drag;
         public float AngularDrag => angularDrag;
         public float SpeedSmooth => speedSmooth;
         public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
-        public Vector3 GetScale(float seed, CapsuleKind kind) =>
-            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed);
+        public Vector3 GetScale(float seed, float lifetime, CapsuleKind kind) =>
+            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed)
+                       * InteractiveEffect.Instance.GetTouchScaleMultiplier(lifetime);
 
-        public float GetEmissionIntensiy(float speed) => math.remap(speedRange.Get().x, speedRange.Get().y, 0, 1, speed);
+        public float GetEmissionIntensiy(float lifeTime, float speed) 
+            => math.remap(speedRange.Get().x, speedRange.Get().y, 0, 1, speed);
 
         #region gui
         private PrefsVector3 normalSize = new PrefsVector3("NormalSize", new Vector3(0.4f, 0.2f, 0.4f));
@@ -76,6 +82,10 @@ namespace TLF
             physicMat.bounciness = bounciness;
             physicMat.staticFriction = staticFriction;
             physicMat.dynamicFriction = dynamicFriction;
+
+            if (Input.GetKeyDown(KeyCode.R))
+                foreach (var c in capsules)
+                    c.Reset();
         }
 
         public void AddPulseForce(Vector3 force, Vector2 random, Color color)
@@ -84,6 +94,11 @@ namespace TLF
                 c.AddForce(force, random, color, true);
         }
 
+        public void AddExplode(Vector3 pos)
+        {
+            foreach (var c in capsules)
+                c.AddExplode(pos);
+        }
         #region generate
         private void CreateCapsules()
         {

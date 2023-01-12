@@ -73,6 +73,7 @@ namespace TLF
                 trackers.Add(tracker);
             }
         }
+
         public virtual void OscMessageReceived(OscPort.Capsule e)
         {
             if (Main.Instance.Mode == Main.PlayMode.Static || !InteractiveEffect.Instance.Enable) return;
@@ -89,7 +90,8 @@ namespace TLF
             var z = (float)e.message.data[6];
             var pos = new Vector3(x, y, -z);
 
-            var trackObject = trackers[playerId].trackObjects[jointId];
+            var tracker = trackers[playerId];
+            var trackObject = tracker.trackObjects[jointId];
             trackObject.UpdatePosition(uniqueId, pos);
         }
 

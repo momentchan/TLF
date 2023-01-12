@@ -4,3 +4,6 @@
 [submodule "Assets/ScriptTemplates"]
 	path = Assets/ScriptTemplates
 	url = https://github.com/momentchan/unity-script-templates.git
+[submodule "Assets/Packages/unity-hdrp-gist"]
+	path = Assets/Packages/unity-hdrp-gist
+	url = https://github.com/momentchan/unity-hdrp-gist.git
