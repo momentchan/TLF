@@ -3,30 +3,38 @@ using mj.gist;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.VFX;
-using static TLF.CapsuleController;
 
 namespace TLF
 {
     public class Capsule : MonoBehaviour
     {
-        InteractiveEffect effect => InteractiveEffect.Instance;
-
-        private CapsuleController controller => CapsuleController.Instance;
-        [SerializeField] private CapsuleKind kind;
         [SerializeField] private float seed;
+        [SerializeField] private MeshRenderer renderer;
+
+        public float nrmT => life / InteractiveEffect.Instance.LifeTime;
+        private CapsuleController controller
+        {
+            get
+            {
+                if (_controller == null)
+                    _controller = GetComponentInParent<CapsuleController>();
+                return _controller;
+            }
+        }
+        private CapsuleController _controller;
+        
+        private InteractiveEffect effect => InteractiveEffect.Instance;
 
         new Rigidbody rigidbody;
-        [SerializeField] private MeshRenderer renderer;
 
         private Block block;
         private float speed;
         private float life = 0;
-        public float nrmT => life / InteractiveEffect.Instance.LifeTime;
 
         private Color emissiveColor;
         private Vector3 initLocalPos;
         private quaternion initLocalRot;
+        private bool exploded = false;
 
         void Start()
         {
@@ -36,8 +44,7 @@ namespace TLF
             rigidbody = GetComponent<Rigidbody>();
             renderer = GetComponent<MeshRenderer>();
             block = new Block(renderer);
-            this.seed = UnityEngine.Random.value;
-
+            seed = UnityEngine.Random.value;
         }
 
         public void AddForce(Vector3 pos, Vector3 vel, Color color)
@@ -86,7 +93,7 @@ namespace TLF
 
             if (nrmT < 1)
             {
-                transform.localScale = controller.GetScale(seed, nrmT, kind);
+                transform.localScale = controller.GetScale(seed, nrmT);
 
                 block.SetColor("_EmissiveColor", emissiveColor);
                 block.SetFloat("_EmissiveIntensity", controller.GetEmissionIntensiy(nrmT, speed));
@@ -99,27 +106,26 @@ namespace TLF
 
             block.Apply();
         }
-        private bool exploded = false;
 
-        IEnumerator Explode()
+        private IEnumerator Explode()
         {
             exploded = true;
 
             yield return null;
             var scale = transform.localScale;
-            var t1 = 0f;
-            var duration = controller.ExplodeDuration;
+            var t = 0f;
+            var duration = effect.ExplodeDuration;
 
-            while (t1 < duration)
+            while (t < duration)
             {
-                t1 += Time.deltaTime;
-                var ratio = t1 / duration;
-                transform.localScale = scale * controller.ExplodeScaleCurve.Evaluate(ratio);
+                t += Time.deltaTime;
+                var ratio = t / duration;
+                transform.localScale = scale * effect.ExplodeScaleCurve.Evaluate(ratio);
 
                 emissiveColor = Color.Lerp(emissiveColor, Color.red, ratio);
 
                 block.SetColor("_EmissiveColor", emissiveColor);
-                block.SetFloat("_EmissiveIntensity", ratio * controller.ExplodeStrength);
+                block.SetFloat("_EmissiveIntensity", ratio * effect.ExplodeEmissionIntensity);
                 yield return null;
             }
             controller.AddExplode(transform.position);

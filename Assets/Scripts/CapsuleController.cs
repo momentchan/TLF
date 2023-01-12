@@ -6,11 +6,10 @@ using PrefsGUI;
 using PrefsGUI.RapidGUI;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.VFX;
 
 namespace TLF
 {
-    public class CapsuleController : SingletonMonoBehaviour<CapsuleController>, IGUIUser
+    public class CapsuleController : MonoBehaviour, IGUIUser
     {
         [SerializeField] FoamTransformDataset foams;
         [SerializeField] private Capsule prefab;
@@ -19,17 +18,13 @@ namespace TLF
         [SerializeField] private int length = 10;
         [SerializeField] private Bound bounds;
         [SerializeField] private List<Capsule> capsules = new List<Capsule>();
-        [SerializeField] private AnimationCurve explodeScaleCurve;
-        public float ExplodeDuration = 0.5f;
-        public float ExplodeStrength = 2f;
-        public AnimationCurve ExplodeScaleCurve => explodeScaleCurve;
+
         public Bound Bounds => bounds;
         public float Drag => drag;
         public float AngularDrag => angularDrag;
         public float SpeedSmooth => speedSmooth;
-        public Vector3 Size(CapsuleKind kind) => kind == CapsuleKind.Normal ? normalSize : specialSize;
-        public Vector3 GetScale(float seed, float lifetime, CapsuleKind kind) =>
-            Size(kind) * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed)
+        public Vector3 GetScale(float seed, float lifetime) =>
+            normalSize.Get() * Mathf.Lerp(sizeRange.Get().x, sizeRange.Get().y, seed)
                        * InteractiveEffect.Instance.GetTouchScaleMultiplier(lifetime);
 
         public float GetEmissionIntensiy(float lifeTime, float speed) 
@@ -64,7 +59,7 @@ namespace TLF
         }
         #endregion
 
-        protected override void Awake()
+        void Awake()
         {
             if (generate)
                 CreateCapsules();
@@ -150,7 +145,5 @@ namespace TLF
         {
             bounds.DrawGizmos();
         }
-
-        public enum CapsuleKind { Normal, Special }
     }
 }

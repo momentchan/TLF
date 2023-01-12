@@ -8,6 +8,7 @@ namespace TLF
 {
     public class InteractiveEffect : SingletonMonoBehaviour<InteractiveEffect>, IGUIUser
     {
+        [SerializeField] private CapsuleController capsuleController;
         public bool Enable => enable;
         private bool enable = true;
 
@@ -18,32 +19,35 @@ namespace TLF
             => Vector3.Lerp(dir, vel, VelocityBlend) * ForcePower;
 
         #region gui
-        public PrefsFloat MaxSpeed = new PrefsFloat("MaxSpeed", 2f);
-        public PrefsFloat SpeedPower = new PrefsFloat("SpeedPower", 200f);
-        public PrefsFloat SpeedThreshold = new PrefsFloat("SpeedThreshold", 0.2f);
+        [HideInInspector] public PrefsFloat MaxSpeed = new PrefsFloat("MaxSpeed", 2f);
+        [HideInInspector] public PrefsFloat SpeedPower = new PrefsFloat("SpeedPower", 200f);
+        [HideInInspector] public PrefsFloat SpeedThreshold = new PrefsFloat("SpeedThreshold", 0.2f);
 
-        public PrefsFloat ForcePower = new PrefsFloat("ForcePower", 100f);
-        public PrefsFloat PulsePower = new PrefsFloat("PulsePower", 300f);
+        [HideInInspector] public PrefsFloat ForcePower = new PrefsFloat("ForcePower", 100f);
+        [HideInInspector] public PrefsFloat PulsePower = new PrefsFloat("PulsePower", 300f);
+        [HideInInspector] public PrefsVector2 PulseRandom = new PrefsVector2("PulseRandom", new Vector2(0.6f, 1f));
 
-        public PrefsVector2 PulseRandom = new PrefsVector2("PulseRandom", new Vector2(0.6f, 1f));
-        public PrefsFloat PulseWarmUpT = new PrefsFloat("PulseWarmUpT", 2f);
-        public PrefsFloat PulseCoolDownT = new PrefsFloat("PulseCoolDownT", 3f);
-        public PrefsInt PulseTriggerNum = new PrefsInt("PulseTriggerNum", 10);
-        public PrefsFloat PulsePeriod = new PrefsFloat("PulsePeriod", 120f);
+        [HideInInspector] public PrefsFloat PulseWarmUpT = new PrefsFloat("PulseWarmUpT", 2f);
+        [HideInInspector] public PrefsFloat PulseCoolDownT = new PrefsFloat("PulseCoolDownT", 3f);
+        [HideInInspector] public PrefsInt PulseTriggerNum = new PrefsInt("PulseTriggerNum", 10);
+        [HideInInspector] public PrefsFloat PulsePeriod = new PrefsFloat("PulsePeriod", 120f);
 
-        public PrefsFloat VelocityBlend = new PrefsFloat("VelocityBlend", 0.95f);
+        [HideInInspector] public PrefsFloat VelocityBlend = new PrefsFloat("VelocityBlend", 0.95f);
 
+        [HideInInspector] public PrefsFloat ColorBlend = new PrefsFloat("ColorBlend", 0.5f);
+        [HideInInspector] public PrefsFloat InteractiveRange = new PrefsFloat("InteractiveRange", 1.25f);
+        [HideInInspector] public PrefsFloat IdleTime = new PrefsFloat("IdleTIme", 2f);
 
-        public PrefsFloat ColorBlend = new PrefsFloat("ColorBlend", 0.5f);
-        public PrefsFloat InteractiveRange = new PrefsFloat("InteractiveRange", 1.25f);
-        public PrefsFloat IdleTime = new PrefsFloat("IdleTIme", 2f);
+        [HideInInspector] public PrefsFloat LifeTime = new PrefsFloat("Lifetime", 2f);
+        [HideInInspector] public PrefsFloat TouchedThreshold = new PrefsFloat("touchedThreshold", 1f);
+        [HideInInspector] public PrefsFloat TouchedScaleMultiplier = new PrefsFloat("TouchedScaleMultiplier", 3);
 
-        public PrefsFloat LifeTime = new PrefsFloat("Lifetime", 2f);
-        public PrefsFloat TouchedThreshold = new PrefsFloat("touchedThreshold", 1f);
-        public PrefsFloat TouchedScaleMultiplier = new PrefsFloat("TouchedScaleMultiplier", 3);
-
-        public PrefsFloat ExplosionForce = new PrefsFloat("ExplosionForce", 200f);
-        public PrefsFloat ExplosionRadius = new PrefsFloat("ExplosionRadius", 2f);
+        [HideInInspector] public PrefsFloat ExplosionForce = new PrefsFloat("ExplosionForce", 200f);
+        [HideInInspector] public PrefsFloat ExplosionRadius = new PrefsFloat("ExplosionRadius", 2f);
+        [HideInInspector] public PrefsFloat ExplodeDuration = new PrefsFloat("ExplodeDuration", 0.5f);
+        [HideInInspector] public PrefsFloat ExplodeEmissionIntensity = new PrefsFloat("ExplodeEmissionIntensity", 2f);
+        [SerializeField] private AnimationCurve explodeScaleCurve;
+        public AnimationCurve ExplodeScaleCurve => explodeScaleCurve;
 
         public string GetName() => "Interaction";
         public float duration = 2f;
@@ -114,7 +118,7 @@ namespace TLF
 
             yield return new WaitForSeconds(PulseWarmUpT);
 
-            CapsuleController.Instance.AddPulseForce(PulsePower * Vector3.up, PulseRandom, Random.ColorHSV(0, 1, 0.5f, 1f, 1f, 1f));
+            capsuleController.AddPulseForce(PulsePower * Vector3.up, PulseRandom, Random.ColorHSV(0, 1, 0.5f, 1f, 1f, 1f));
 
             yield return new WaitForSeconds(PulseCoolDownT);
             enable = true;
